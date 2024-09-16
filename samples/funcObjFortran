@@ -1,0 +1,517 @@
+!**********************************************************************
+!               SUBROTINA PARA CRIAR A FUNCAO OBJETIVO
+!**********************************************************************
+!
+!     A FUNCAO OBJETIVO E AQUELA QUE DETERMINARA O PONTO OTIMO, OU SEJA
+!     O NEUTRALIZADOR MAIS EFICIENTE DENTRO DA FAIXA DE FREQUENCIA DE
+!     INTERESSE
+!**********************************************************************
+!--------------------------------------------------------------
+!     Nesta funcao objetivo estao contemplados dois modelos
+!     de neutralizador, comum e com centro de percussao.(NMNEU)
+!--------------------------------------------------------------
+!
+      SUBROUTINE FOBMODAL1(XXX,G,knd)
+!
+      USE MODULO1
+!     parametros
+      integer knd
+      REAL*8 G
+      REAL*8 XXX(mxv)
+!     locais
+      integer nx
+      REAL*8 CE,ME,EPSA,RTG,OMG,CE1,CE2,ME1,ME2,EPSA1,EPSA2
+      REAL*8 RTG1,RTG2
+      REAL*8 BETY(mxl),VAU1(mxv),GRAGR(mxv),OMA(mxv),CSIA(mxv),Rvar(mxv)
+!
+      complex*16 gcplx,D0T,AUXI
+      COMPLEX*16 PSUM1(mxl)
+      complex*16 B(mxv,1),FF(mxl,1)
+      complex*16 MAT(mxv,mxv),CAT(mxv,mxv),AINV(mxv,mxv)
+!     inversao lapack
+      INTEGER lwork,info
+      INTEGER ipiv(mxv)
+      PARAMETER (lwork = 64 * mxv)
+      COMPLEX*16 work(lwork)
+!
+      G = 0. ! inicia retorno
+      nx = nt ! numero de modos
+
+!     XXX(l) � A FREQUENCIA NATURAL DO NEUTRALIZADOR (Hz)
+!     altera��es para leitura do amortecimento
+!*******************************************************
+
+!*******************************************************
+!ALTERA��ES PARA OTIMIZAR POSI��O DO NEUTRALIZADOR
+      if((nmneu .eq.1) .or. (nmneu .eq. 5).or. (nmneu .eq. 7)) then
+      do I=1,NN
+      Frow(I)=XXX(NN+I)
+!      write(*,*) "vetor projeto para otimiza��o"
+!      write(*,*) XXX(2*NN+I)
+      end do
+
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+      do I=1,NN
+      Frow(I)=XXX(2*NN+I)
+!      write(*,*) "vetor projeto para otimiza��o"
+!      write(*,*) XXX(2*NN+I)
+      end do
+
+      else if(nmneu .eq. 8) then
+      do I=1,NN
+      Frow(I)=XXX(NN+I)
+      Frow2(I)=XXX(2*NN+I)
+!      write(*,*) "vetor projeto para otimiza��o"
+!      write(*,*) XXX(2*NN+I)
+      end do
+
+      end if
+ !*******************************************************
+      call massa_modal(tmassa,nn,nj,frow,ji,mu,maa,masnovo,fi,mxv,mxl)
+      if (tmassa .eq. 0) then
+      do ima=1,NN
+      ma(ima)= Masp*0.02 !masnovo(ima)
+      end do
+      end if
+!      write(*,*) "massa neutralizador"
+!      write(*,*) masnovo(1)
+!*******************************************************
+      if(sime.eq.1)then
+      if(nmneu .eq. 5) then
+      do I=1,NN
+      Rvar(I)=Rpar(I)
+!      write(*,*) Rpar(I)
+      end do
+      end if
+      if((nmneu .eq. 1) .or. (nmneu .eq. 5) .or.
+     &   (nmneu .eq. 7) .or. (nmneu .eq. 8)) then
+!*******************************************************
+        DO I = 1,NN
+            OMA(I) = (2. * pi * XXX(I))
+!            write(*,*) "OMA"
+!            write(*,*) I , OMA(I), jrs
+!            jrs=Jrs+1
+!            write(*,*) "OMA"
+!            write(*,*) I , OMA(I), jrs
+!--------------------------------------------------------
+!       CALCULO DO MODULO DE CISALHAMENTO PARA OMEGA
+!       a (freq de antiressonancia de cada neutralizador)
+!--------------------------------------------------------
+            auxi = gcplx(GL,GH,fi0mod,alfaT,betat,oma(i))
+            GRAGR(I) = REAL(auxi)
+        END DO
+ !*******************************************************
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+        DO I = 1,NN
+            OMA(I) = (2. * pi * XXX(2*I-1))
+!            write(*,*) I
+!            write(*,*) OMA(I)
+            CSIA(I) = XXX(2*I)
+            !ADICIONAR MENSAGEM DE ERRO CSI>1 OU CSI<0
+!--------------------------------------------------------
+!       CALCULO DO MODULO DE CISALHAMENTO PARA OMEGA
+!       a (freq de antiressonancia de cada neutralizador)
+!--------------------------------------------------------
+            auxi = gcplx(GL,GH,fi0mod,alfaT,betat,oma(i))
+            GRAGR(I) = REAL(auxi)
+        END DO
+      end if
+      else if(sime.eq.0) then
+      if((nmneu .eq. 1) .or. (nmneu .eq. 5) .or.
+     &   (nmneu .eq. 7) .or. (nmneu .eq. 8)) then
+!*******************************************************
+        DO I = 1,2*NN
+            OMA(I) = (2. * pi * XXX(I))
+            jrs=Jrs+1
+!            write(*,*) "OMA"
+!            write(*,*) I , OMA(I), jrs
+!--------------------------------------------------------
+!       CALCULO DO MODULO DE CISALHAMENTO PARA OMEGA
+!       a (freq de antiressonancia de cada neutralizador)
+!--------------------------------------------------------
+            auxi = gcplx(GL,GH,fi0mod,alfaT,betat,oma(i))
+            GRAGR(I) = REAL(auxi)
+        END DO
+ !*******************************************************
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+        DO I = 1,2*NN
+            OMA(I) = (2. * pi * XXX(2*I-1))
+!            write(*,*) I
+!            write(*,*) OMA(I)
+            CSIA(I) = XXX(2*I)
+            !ADICIONAR MENSAGEM DE ERRO CSI>1 OU CSI<0
+!--------------------------------------------------------
+!       CALCULO DO MODULO DE CISALHAMENTO PARA OMEGA
+!       a (freq de antiressonancia de cada neutralizador)
+!--------------------------------------------------------
+            auxi = gcplx(GL,GH,fi0mod,alfaT,betat,oma(i))
+            GRAGR(I) = REAL(auxi)
+        END DO
+      end if
+      end if
+!*******************************************************
+!--------------------------------------------------
+!     CALCULO DA FREQUENCIA EM RADIANOS POR SEGUNDO
+!--------------------------------------------------
+!     NT = numero de modos considerados (matriz truncada)
+!     VAU sao as frequencias naturais do sistema em [Hz]
+      DO I = 1,NT
+        BETY(I) = 0.
+        PSUM1(I) = (0.,0.)
+        VAU1(I) = VAU(I) * 2. * pi
+!       knd=1 -> excitacao delta dirac
+!       {ff} =[ 0 0 0... 1 .. 0 0]T (1 em PF1)
+!       [fi]T nt x ng * {ff} ng x 1 -> {B} nt x 1
+        if (knd .eq. 1) B(I,1) = FI(PF1,I) ! coluna matriz [fi]
+      END DO
+!     prepara vetor B
+!     excitacao distribuida
+      if (knd .eq. 2) then
+        DO I=1,NG ! numero de graus de liberdade
+          FF(I,1) = DCMPLX(0.,0.) ! inicia vetor
+          if (pf1 .eq. -1) FF(I,1)=DCMPLX(1.,0.) ! excitacao distribuida
+          if (pf1 .eq. i) FF(I,1)=DCMPLX(1.,0.) ! excitacao ponto pf1
+        END DO
+        AUXI = dcmplx(1.,0.)
+        D0T = dcmplx(0.,0.)
+!       [fi]T nt x ng * {ff} ng x 1 -> {B} nt x 1
+        CALL ZGEMM('Transpose', 'No transpose',nt , 1,
+     &             ng, auxi, fi, mxl, ff, mxl, d0t, B, mxv)
+      end if
+! -------------------------------------------
+! [H(W)] tem dimensao ng (graus de liberdade)
+! fobj=6 -> coluna da matriz [H(W)]
+! -------------------------------------------
+      if (knd .eq. 6) then ! [H] ng x ng
+        nx = ng ! graus de liberdade
+        DO I = nt,ng
+          BETY(I) = 0.
+          PSUM1(I) = (0.,0.)
+        END DO
+      end if
+!----------------------------------------------
+!     RESOLUCAO DO SISTEMA PARA CADA FREQUENCIA
+!     ENTRE OM1 E OM2 COM KDIV DIVISOES.
+!----------------------------------------------
+!     ESTE DO SO FECHA NO FINAL, determina a
+!     banda de frequencias de analise.
+!----------------------------------------------
+      DO  K = 1,KDIV
+!--------------------------------------------------
+!       OM(K) SAO KDIV FREQUENCIAS ENTRE OM1 E OM2,
+!       S�O KDIV PONTOS NA FAIXA DE INTERESSE
+!--------------------------------------------------
+        OMG = OM(K)
+!---------------------------------------------
+!       CALCULO DE MA E CA DA ORDEM DE (NT,NT)
+!---------------------------------------------
+        DO I = 1,NT
+          DO J = 1,NT
+            MAT(I,J) = (0.,0.)
+            CAT(I,J) = (0.,0.)
+            if(sime.eq.0)then
+              DO L = 1,NN
+                EPSA1 = OMG / OMA(L)    ! epsilon
+                EPSA2 = OMG / OMA(L+NN) ! epsilon
+!               GR = PARTE REAL DO MODULO DE CISALHAMENTO COMPLEXO
+                RTG1 = GR(K) / GRAGR(L) ! R
+                RTG2 = GR(K) / GRAGR(L+NN) ! R
+!               C11
+
+!---------------------------------------------------------------
+!     CALCULO DE CE E ME (PARAMETROS EQUIVALENTES GENERALIZADOS)
+!---------------------------------------------------------------
+!ALTERA��ES------------------------------------------------------------------------------------
+                if(nmneu .eq.1) then
+                call p_eqv (NMNEU,ma(L),ms,oma( L  ),rtg1,etag(k),epsa1,
+     &                      ce1,me1,sime,CP)
+                call p_eqv (NMNEU,ma(L),ms,oma(L+NN),rtg2,etag(k),epsa2,
+     &                      ce2,me2,sime,CP) ! ma(L+NN) ?
+                else if((nmneu .eq. 2) .or. (nmneu .eq. 3)) then
+                call p_eqv34 (ma(L),oma( L  ),CSIA(L),epsa1,ce1,me1,
+     &           sime,CP)!****************************************
+                call p_eqv34 (ma(L),oma( L  ),CSIA(L+NN),epsa2,ce2,me2,
+     &          sime,cp )!****************************************
+                else if(nmneu .eq. 4) then
+                call p_eqv5 (ma(L),oma(L), CSIA(L), epsa1, ce1, me1,
+     &           sime, CP)
+                call p_eqv5 (ma(L),oma(L), CSIA(L+NN), epsa2, ce2, me2,
+     &           sime, CP)
+                end if
+!ALTERA��ES------------------------------------------------------------------------------------
+                me = me1+me2
+                ce = ce1+ce2
+                !FROW SAO OS NOS ONDE SAO FIXADOS OS NEUTRALIZADORES
+                MAT(I,J) = MAT(I,J) + dcmplx(ME,0.) * FI(FROW(L),I) *
+     &                   FI(FROW(L),J)
+                CAT(I,J) = CAT(I,J) + dcmplx(CE,0.) * FI(FROW(L),I) *
+     &                   FI(FROW(L),J)
+              END DO
+            else if(sime.eq.1)then
+              DO L = 1,NN
+                EPSA = OMG / OMA(L)    ! epsilon
+!               GR = PARTE REAL DO MODULO DE CISALHAMENTO COMPLEXO
+                RTG = GR(K) / GRAGR(L) ! R
+!---------------------------------------------------------------
+!     CALCULO DE CE E ME (PARAMETROS EQUIVALENTES GENERALIZADOS)
+!---------------------------------------------------------------
+
+                if(nmneu .eq.1) then
+                call p_eqv (NMNEU,ma(l),ms,oma(l),rtg,etag(k),epsa,ce,
+     &                      me,sime,CP)
+                else if((nmneu .eq. 2) .or. (nmneu .eq. 3)) then
+                call p_eqv34 (ma(L),oma( L  ),CSIA(L),epsa,ce,me,sime,
+     &           CP)!****************************************
+                else if(nmneu .eq. 4) then
+                call p_eqv5 (ma(L),oma(L), CSIA(L), epsa, ce, me,sime,
+     &           CP)
+                else if(nmneu .eq. 5) then
+                call p_eqv6 (ma(L),oma(L),rtg,etag(k),epsa,Rpar(l), ce,
+     &            me)
+                else if(nmneu .eq. 6) then
+                call p_eqv7 (ma(L),oma(L),CSIA(L),epsa,GRAGR(L),rtg,
+     &           etag(k), ce, me)
+                else if(nmneu .eq. 7) then
+                call p_eqv8 (oma(L),epsa,GRAGR(L),rtg,etag(k),ce,me)
+                end if
+
+      !links viscoel�sticos conectados entre dois pontos do sistema prim�rio
+                if(nmneu .eq.8) then
+                call p_eqv8 (oma(L),epsa,GRAGR(L),rtg,etag(k),ce,me)
+      !Frow representa extremidade da base
+      !Frow2 representa a extremidade final
+                MAT(I,J) = MAT(I,J) + dcmplx(ME,0.) * FI(FROW(L),I) *
+     &              FI(FROW(L),J) + dcmplx(ME,0.) * FI(FROW2(L),I) *
+     &              FI(FROW2(L),J) - dcmplx(ME,0.) * FI(FROW(L),I) *
+     &              FI(FROW2(L),J) - dcmplx(ME,0.) * FI(FROW2(L),I) *
+     &                   FI(FROW(L),J)
+
+                CAT(I,J) = CAT(I,J) + dcmplx(CE,0.) * FI(FROW(L),I) *
+     &              FI(FROW(L),J) + dcmplx(CE,0.) * FI(FROW2(L),I) *
+     &              FI(FROW2(L),J) - dcmplx(CE,0.) * FI(FROW(L),I) *
+     &              FI(FROW2(L),J) - dcmplx(CE,0.) * FI(FROW2(L),I) *
+     &                   FI(FROW(L),J)
+
+                else
+
+                !FROW SAO OS NOS ONDE SAO FIXADOS OS NEUTRALIZADORES
+                MAT(I,J) = MAT(I,J) + dcmplx(ME,0.) * FI(FROW(L),I) *
+     &                   FI(FROW(L),J)
+                CAT(I,J) = CAT(I,J) + dcmplx(CE,0.) * FI(FROW(L),I) *
+     &                   FI(FROW(L),J)
+
+                endif
+!      write(*,*) "ME"
+!      write(*,*)  ME
+!      write(*,*) "CE"
+!      write(*,*)  CE
+!            !*******************************************
+!      psds=1
+!      do asdfds = 1, 10
+!      do asdfs = 1, 10
+!      psds=psds+1
+!      end do
+!      end do
+              END DO
+            endif
+          END DO
+        END DO
+
+!      write(*,*) "OM","GRW","ME","CE"
+!      write(*,*) OMA(1), OMG, GRW, ME, CE, K
+!-------------------------------------------------
+!       CALCULO DE [D0]=[\Kj - Mj*OMI^2 + i*ETAj\]
+!--------------------------------------------------------
+!       CALCULO DE [D]=[D0] + [-OMI^2*[MA] + i*OMI*[CA]]
+!--------------------------------------------------------
+!       SOMA DE D0T COM AUXI
+!---------------------------
+        DO I = 1,NT
+          D0T = DCMPLX(((VAU1(I)) ** 2. - (OMG) ** 2.),
+     &                 (VAU1(I)) ** 2. * ETA(I))
+          DO J = 1,NT
+            AUXI = (-1.,0.) * (dcmplx(OMG ** 2.,0.) * MAT(I,J))
+     &               + (dcmplx(0.,OMG) * CAT(I,J))
+            AINV(I,J) = AUXI
+
+            if (i .eq. j) ainv(i,j) = auxi + D0T
+          END DO
+        END DO
+!--------------------------
+!       CALCULO DE [D]^(-1)
+!--------------------------
+!       lapack complex invertion driver
+        call ZGETRI( NT, ainv, mxv, IPIV, WORK, LWORK, INFO )
+        if (info .ne. 0) then
+          print *,'ZGETRI invertion error! info=',info
+          write(*,*) Ainv(info,info)
+         stop
+        end if
+! -----------------------------
+!       tipo de funcao objetivo
+! -----------------------------
+        call tipofob(knd,ainv,b,psum1,bety)
+!
+!       fim loop KDIV
+      end do
+! ----------------------------
+!     somatorio modulo^2 psum1
+! ----------------------------
+      DO I = 1,NX
+        G = G + (PSUM1(I) * DCONJG(PSUM1(I)))
+      END DO
+!--------------------
+!     FUNCAO OBJETIVO
+! G estava dividido por 10^-6 mas isso ser� retirado
+!--------------------
+!      write(*,*) "Valor da norma dois"
+!      write(*,*) G
+!      write(*,*) "Valor da parte ponderada pela massa"
+!      write(*,*) G*ma(1)/(0.02*MASP)
+      G = G+ G*ma(1)/(0.02*MASP)
+!      write(*,*) "G"
+!      write(*,*) G
+
+
+      RETURN
+!
+      END
+!
+! -----------------------------
+!     processa funcoes objetivo
+! -----------------------------
+!     knd - tipo de funcao
+!     ainv - matriz D^-1
+!     psum1 - vetor de maximos
+!     bety - vetor local de maximos
+      subroutine tipofob(knd,ainv,b,psum1,bety)
+      use modulo1
+!     argumentos
+      integer knd
+      complex*16 AINV(mxv,mxv),B(mxv,1)
+      COMPLEX*16 PSUM1(mxl)
+      REAL*8 BETY(mxl)
+!     locais
+      REAL*8 me
+!      complex*16 MAT(mxl,mxl),CAT(mxl,mxl)
+      complex*16 C(mxv,1)
+      complex*16 D0T,AUXI
+!
+! ----------------------------
+!     tipo de funcao objetivo
+!------------------------------------------
+!       CALCULO DAS COORDENADAS PRINCIPAIS
+!      {P}=[D]^-1*{N}, ONDE {N}=[FI]^t*{F0}
+!------------------------------------------
+      if ((knd .eq. 1) .or. (knd .eq. 2)) then
+        AUXI = dcmplx(1.,0)
+        D0T = dcmplx(0.,0.)
+        CALL ZGEMM('No transpose', 'No transpose',nt , 1,
+     &             nt, auxi, AINV, mxv, B, mxv, d0t, C, mxv )
+! ------------------------------------------------
+!       procura maximo de cada posicao vetor P (C)
+! ------------------------------------------------
+        DO I = 1,NT ! numero de modos
+          IF (CDABS(C(I,1)) .gt. BETY(I)) THEN
+            PSUM1(I) = C(I,1)
+            BETY(I) = CDABS(C(I,1))
+          END IF
+        END DO
+! --------------------------
+!     norma 2 da matriz D^-1
+! --------------------------
+      else if(knd .eq. 3) then
+        me = 0.
+        DO I=1,NT
+          DO J=1,NT
+            me = me + CDABS(AINV(I,J)) ** 2.
+          END DO
+        END DO
+! ------------------------------------
+!       maximo [D^-1] utiliza
+!       somente a posicao 1 do vetor P
+! ------------------------------------
+        IF (me .gt. BETY(1)) THEN
+          bety(1) = me
+          PSUM1(1) = me ** .25 !
+        END IF
+! ------------------------------
+!     receptancia [H(W)] PF1,PX1
+! ------------------------------
+      else if (knd .eq. 4) then
+        if (px1 .le. 0) px1 = 1 ! evita erro px1 <= 0
+        if (pf1 .le. 0) pf1 = 1 ! evita erro pf1 <= 0
+        auxi = (0.,0.)
+        DO I = 1,NT ! numero de modos
+          DO J = 1,NT
+            auxi = auxi + AINV(I,J) * FI(PF1,J) * FI(PX1,I)
+          END DO
+        END DO
+! -----------------------------------
+!       maximo [H(W)] utiliza somente
+!       a posicao 1 do vetor P
+! -----------------------------------
+        IF (cdabs(auxi) .gt. BETY(1)) THEN
+          bety(1) = cdabs(auxi)
+          PSUM1(1) = dsqrt(cdabs(auxi))
+        END IF
+! ----------------------
+!     receptancia [H(W)]
+! ----------------------
+!      else if ((knd .eq. 5) .or. (knd .eq. 6))then
+!        AUXI = dcmplx(1.,0)
+!        D0T = dcmplx(0.,0.)
+!!       [FI] ng x nt * [D^-1] nt x nt -> [mat] ng x nt
+!        CALL ZGEMM('No transpose', 'No transpose',ng , nt,
+!     &             nt, auxi, fi, mxl, AINV, mxv, d0t, mat, mxl )
+!!
+!!       [mat] ng x nt * [FI]T nt x ng -> [cat] ng x ng
+!        CALL ZGEMM('No transpose', 'Transpose', ng , ng,
+!     &             nt, auxi, mat, mxl, fi, mxl, d0t, cat, mxl )
+!! ------------------------------
+!!       norma 2 da matriz [H(W)]
+!! ------------------------------
+!        if (knd .eq. 5) then
+!          me = 0.
+!          DO I = 1,NG ! atencao numero de graus de liberdade
+!            DO J = 1,NG
+!              me = me + CDABS(cat(I,J)) ** 2.
+!            END DO
+!          END DO
+!! --------------------------------------
+!!         maximo global, utiliza
+!!         somente a posicao 1 do vetor P
+!! --------------------------------------
+!          IF (me .gt. BETY(1)) THEN
+!            bety(1) = me
+!            PSUM1(1) = (me ** .25)
+!          END IF
+!! ----------------------------------------
+!!       vetor max coluna px1 matriz [H(W)]
+!! ----------------------------------------
+!        else
+!          if (px1 .le. 0) px1 = 1 ! evita erro px1 <= 0
+!! ----------------------------------------------------
+!!         procura maximo de cada posicao vetor H (cat)
+!! ----------------------------------------------------
+!          DO I = 1,NG ! atencao numero de graus de liberdade
+!            IF (CDABS(cat(I,PX1)) .gt. BETY(I)) THEN
+!              PSUM1(I) = cat(I,PX1) ! vetor com os maximos
+!              BETY(I) = CDABS(cat(I,PX1))
+!            END IF
+!          END DO
+!        end if
+! ------------------------------------------
+!       fim if knd (tipo de funcao objetivo)
+! ------------------------------------------
+      end if
+!
+      return
+!
+      end
+!
+!
+!

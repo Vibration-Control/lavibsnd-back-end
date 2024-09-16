@@ -1,0 +1,767 @@
+!***********************************************************************
+!
+!                 FUNCOES DE DESIGUALDADE
+!
+!***********************************************************************
+!
+!
+!     SUBROUTINA PARA ACHAR AS FUNCOES RESTRICOES DE DESIGUALDADE QUE
+!                  PARA FORMAR A FUNCAO DE PENALIDADE.
+!
+!***********************************************************************
+      SUBROUTINE RDEMODAL(XDK,RDES)
+!
+      USE MODULO1
+
+      IMPLICIT REAL*8 (A-H,O-Z)
+!
+      REAL*8 XDK(mxv),RDES(mxv)
+!
+!     XDK = VETOR DE DESENHO
+!     DK E O VETOR DADO DE RESTRICOES DE DESIGUALDADE
+!     DK = (DK11,DK21,DC11,DC21,DK12,DK22,DC12,DC22)
+
+!
+      J=1
+      jj=1
+      if((nmneu .eq. 1) .or. (nmneu .eq. 5) .or.
+     &   (nmneu .eq. 7) .or. (nmneu .eq. 8)) then
+      DO I=1,NN
+        RDES(J) = XDK(I) - DK(J)
+        RDES(J+1) = (-1.0D0)*XDK(I) + DK(J+1)
+!        write(*,*)"RDES(",J,")"
+!        write(*,*) RDES(J)
+!        write(*,*)"RDES(",J+1,")"
+!        write(*,*) RDES(J+1)
+!        write(*,*)"XDK(",I,")"
+!        write(*,*)XDK(I)
+
+        RDES(NN+j) = XDK(NN+i) - DK(NN+J)
+        RDES(NN+J+1) = (-1.0D0)*XDK(NN+i) + DK(NN+J+1)
+!        write(*,*)"RDES(",NN+J,")"
+!        write(*,*) RDES(NN+J)
+!        write(*,*)"RDES(",NN+J+1,")"
+!        write(*,*) RDES(NN+J+1)
+!        write(*,*)"XDK(",NN+I,")"
+!        write(*,*)XDK(NN+I)
+        J=J+2
+
+      end do
+!
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+           DO I=1,NV
+        RDES(J) = XDK(I) - DK(J)
+        RDES(J+1) = (-1.0D0)*XDK(I) + DK(J+1)
+!        write(*,*)"RDES(",J,")"
+!        write(*,*) RDES(J)
+!        write(*,*)"RDES(",J+1,")"
+!        write(*,*) RDES(J+1)
+!       write(*,*)"XDK(",I,")"
+!        write(*,*)XDK(I)
+
+
+        RDES(NN+j) = XDK(NN+i) - DK(NN+J)
+        RDES(NN+J+1) = (-1.0D0)*XDK(NN+i) + DK(NN+J+1)
+!       write(*,*)"RDES(",NN+J,")"
+!        write(*,*) RDES(NN+J)
+!        write(*,*)"RDES(",NN+J+1,")"
+!        write(*,*) RDES(NN+J+1)
+!       write(*,*)"XDK(",NN+I,")"
+!        write(*,*)XDK(NN+I)
+
+        J=J+2
+      END DO
+      end if
+
+
+      RETURN
+      END
+!
+! ----------------------------------
+! FUNCAO OBJETIVO - FUNCAO PONDERADA
+! ----------------------------------
+      FUNCTION FUNC(XXX)
+!
+      USE MODULO1
+!
+      REAL*8 XXX(mxv),RDES(mxv)
+      REAL*8 G,FUNC
+      integer i
+
+
+      if((nmneu .eq.1) .or. (nmneu .eq. 5) .or. (nmneu .eq. 7)) then
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - ANTES"
+!      write(*,*) xxx(NN+1)
+      do i=1,NN
+      xxx(NN+i)=int((xxx(NN+i)+0.5))
+      end do
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - DEPOIS"
+!      write(*,*) xxx(NN+1)
+
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - ANTES"
+!      write(*,*) xxx(2*NN+1)
+      do i=1,NN
+      xxx(2*NN+i)=int((xxx(2*NN+i)+0.5))
+      end do
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - DEPOIS"
+!      write(*,*) xxx(2*NN+1)
+
+      else if(nmneu .eq. 8) then
+      do I=1,NN
+      Frow(I)=XXX(NN+I)
+      Frow2(I)=XXX(2*NN+I)
+!      write(*,*) "vetor projeto para otimiza��o"
+!      write(*,*) XXX(2*NN+I)
+      end do
+
+      end if
+!-------------------------------
+!     CALCULO DA FUNCAO OBJETIVO
+!-------------------------------
+      CALL FOBMODAL1(XXX,G,TIPOSAI)
+!-------------------------------------------
+!     CALCULO DAS RESTRICOES DE DESIGUALDADE
+!-------------------------------------------
+      CALL RDEMODAL(XXX,RDES)
+!----------------------------
+!     FUNCAO PONDERADA
+!----------------------
+      if((nmneu .eq. 1) .or. (nmneu .eq. 5) .or.
+     &   (nmneu .eq. 7) .or. (nmneu .eq. 8)) then
+      DO I=1,3*NN
+        IF(RDES(I) .LE. 0.)G = G + 1/(2 * RK) * (RDES(I)) ** 2.
+      END DO
+
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+      DO I=1,6*NN
+        IF(RDES(I) .LE. 0.)G = G + 1/(2 * RK) * (RDES(I)) ** 2.
+      END DO
+!
+      end if
+      FUNC = G
+!
+      RETURN
+!
+      END
+!
+! ------------------------------
+! CALCULO DO GRADIENTE DA FUNCAO
+! ------------------------------
+      SUBROUTINE DFUNC(XXX,DF2)
+!
+      USE MODULO1
+!
+      REAL*8 A,B,F,COR,FUNC
+      REAL*8 XXX(mxv),DF2(mxv)
+!
+      COR=0.00001D0
+      DO I=1,NV
+        A = XXX(I)
+        XXX(I)= A + COR
+        F = FUNC(XXX)
+        B = F
+        XXX(I)= A - COR
+        F = FUNC(XXX)
+        DF2(I) = (B - F) / (2. * COR)
+        XXX(I) = A
+      END DO
+!
+      RETURN
+!
+      END
+!
+! ---------------------------------------
+! FUNCAO OBJETIVO USADA PELO GA (INICIAL)
+! ---------------------------------------
+      SUBROUTINE FUNC2(XXX,G)
+!
+      USE MODULO1
+!
+      REAL*8 XXX(mxv)
+      REAL*8 G
+      integer i
+
+      if((nmneu .eq.1) .or. (nmneu .eq. 5) .or. (nmneu .eq. 7)) then
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - ANTES"
+!      write(*,*) xxx(NN+1)
+      do i=1,NN
+      xxx(NN+i)=int((xxx(NN+i)+0.5))
+      end do
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - DEPOIS"
+!      write(*,*) xxx(NN+1)
+
+      else if((nmneu .eq. 2) .or. (nmneu .eq. 3) .or.
+     &        (nmneu .eq. 4) .or. (nmneu .eq. 6)) then
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - ANTES"
+!      write(*,*) xxx(2*NN+1)
+      do i=1,NN
+      xxx(2*NN+i)=int((xxx(2*NN+i)+0.5))
+      end do
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - DEPOIS"
+!      write(*,*) xxx(2*NN+1)
+
+      else if((nmneu .eq. 8)) then
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - ANTES"
+!      write(*,*) xxx(NN+1)
+!      write(*,*) xxx(2*NN+1)
+      do i=1,NN
+      xxx(NN+i)=int((xxx(NN+i)+0.5))
+      xxx(2*NN+i)=int((xxx(2*NN+i)+0.5))
+      end do
+!      write(*,*) " TESTE LOCALIZA��O VETOR PROJETO - DEPOIS"
+!      write(*,*) xxx(NN+1)
+!      write(*,*) xxx(2*NN+1)
+
+
+      end if
+!-------------------------------
+!     CALCULO DA FUNCAO OBJETIVO
+!-------------------------------
+      CALL FOBMODAL1(XXX,G,TIPOSAI)
+!
+      RETURN
+!
+      END
+!
+!-----------------------------------------
+!     CALCULO DA MASSA DOS NEUTRALIZADORES
+!-------------------------------------------
+!     knd - tipo de calculo (0 modal iguais)
+!     nn - numero de neutralizadores
+!     nj - modos a neutralizar
+!     frow - posicao nodal do neutralizador
+!     ji - numero do modo a neutralizar
+!     mu - relacao de massas se tpmu=0
+!     maa - massa definida se tpmu=1
+!     ma - retorna massa do neutralizador
+!     fi - matriz modal complexa ng x nt
+!     mxv - dimensao nt
+!     mxl - dimensao ng
+!-------------------------------------------
+      subroutine massa_modal(knd,nn,nj,frow,ji,mu,maa,ma,fi,mxv,mxl)
+      implicit none
+!
+      integer  knd,nn,nj,mxv,mxl
+      integer  FROW(mxv),JI(mxv)
+      REAL*8   MU(mxv),maa(mxv),MA(mxv),aux(mxl,mxv)
+      COMPLEX*16 FI(mxl,mxv)
+
+!
+      integer i,j,l,ii,jj
+      REAL*8  mac(mxv)
+!**************************************************
+!      do ii=1,NN
+!      ma(ii)=0
+!      end do
+!**************************************************
+
+      DO Ii = 1,NN
+      ma(Ii)=0.
+!      write(*,*) ma(ii)
+      end do
+      do jj=1,Nj
+      Mac(jj)=0.
+      end do
+      aux=0.
+!
+! ---------------
+! tipo de calculo
+! ---------------
+      if (knd .eq. 0) then
+! -----------------------
+! massas iguais (default)
+! -----------------------
+        DO I = 1,NN
+          DO J = 1,NJ
+            MAC(J) = 0.0D0
+!            write(*,*) "MAC(J)"
+!            write(*,*) MAC(J)
+            DO L = 1,NN
+!            write(*,*) "NN"
+!            write(*,*) NN
+            if ((CDABS(FI(FROW(L),JI(J)))) ** 2. .eq. 0.) then
+            aux(frow(L),JI(J))=1.0d-5
+!            write(*,*) "valor de fi � zero"
+            elseif ((CDABS(FI(FROW(L),JI(J)))) ** 2. .gt. 0 ) then
+            aux(frow(L),JI(J))=(CDABS(FI(FROW(L),JI(J)))) ** 2.
+            end if
+
+              MAC(J) = MAC(J) + aux(frow(L),JI(J))
+!           write(*,*) "posicao"
+!           write(*,*) Frow(L)
+!           write(*,*) "Valor do modo Phi"
+!          write(*,*) (CDABS(FI(FROW(L),JI(J))))
+            END DO
+            MAC(J) = MU(J) / MAC(J)
+!            write(*,*) "MAC(J) e MU(J)"
+!            write(*,*) MAC(J)
+!            write(*,*) MU(J)
+            MA(I) = MA(I) + MAC(J) / NJ
+          END DO
+
+
+        END DO
+
+
+! --------------------
+! else tipo de calculo
+! --------------------
+      elseif (knd .eq. 1) then
+! --------------------------------------------
+! massa do neutralizador definida pelo usuario
+! --------------------------------------------
+        DO I = 1,NN
+!          write(*,*) maa(I)
+!          write(*,*) "testando massa"
+          ma(I) = dabs(maa(I))
+        END DO
+! ----------------------
+! fim if tipo de calculo
+! ----------------------
+      end if
+!
+!     retorno
+!
+      return
+
+!      DO Ii = 1,NN
+!      ma(Ii)=0.
+!      end do
+!      do jj=1,Nj
+!      Mac(jj)=0.
+!      end do
+!
+      end
+!
+! -----------------------------------
+!     modulo de cisalhamento complexo
+! --------------------------------------------
+!     GL - modulo de cisalhamento inferior G0
+!     GH - modulo de cisalhamento superior Goo
+!     fi0mod - parametrom modelo
+!     alfaT - shift
+!     betat - derivada fracionaria
+!     om - frequencia (rad/s)
+!---------------------------------------------
+      complex*16 function gcplx(GL,GH,fi0mod,alfaT,betat,om)
+      implicit none
+!     argumentos
+      real*8 GL,GH,fi0mod,alfaT,betat,om
+!
+      gcplx = (DCMPLX(GL,0.) + DCMPLX((GH * fi0mod),0.) *
+     &         (DCMPLX(0.,(alfaT * OM))) ** betat) /
+     &     (1. + fi0mod * (DCMPLX(0.,(alfaT * OM))) ** betat)
+!
+      return
+!
+      end
+!
+! ----------------
+!     shift factor
+! -------------------------------------
+!     TT0 - temperatura de referencia K
+!     TT1 - temperatura de trabalho K
+!     teta1 - parametro
+!     teta2 - parametro
+! -------------------------------------
+      real*8 function alfa(TT0,TT1,teta1,teta2)
+      implicit none
+!     argumentos
+      real*8 TT0,TT1,teta1,teta2
+!     locais
+      real*8 deltaT
+!
+      deltaT = (TT1 - TT0)
+      alfa = 10.0d0 ** (-teta1 * deltaT / (teta2 + deltaT))
+!
+      return
+!
+      end
+!
+! ---------------------
+! cisalhamento complexo
+! ---------------------
+      subroutine calc_g(mxm,kdiv,OM1,OM2,OM,GR,ETAG,
+     &                   GL,GH,fi0mod,alfaT,betat)
+      implicit none
+!
+      integer mxm,kdiv
+      real*8 OM1,OM2,GL,GH,fi0mod,alfaT,betat
+      real*8 OM(mxm),GR(mxm),ETAG(mxm)
+!
+      COMPLEX*16 GCOM
+!
+      integer i
+      real*8 LI,LS,INCR,ww
+      real*8 PI
+      COMPLEX*16 gcplx
+      parameter (PI = 3.141592653589793)
+!
+      LI = (2. * PI * OM1)
+      LS = (2. * PI * OM2)
+      INCR = (LS - LI) / (KDIV - 1)
+!
+      ww = li
+      DO I = 1,KDIV
+!
+! ---------------------------------------------
+!       SAO KDIV FREQUENCIAS ENTRE OM1 E OM2,
+!       QUE SAO OM1 EM RAD/S MAIS UM INCREMENTO.
+! ---------------------------------------------
+        OM(I) = ww
+        GCOM =  gcplx(GL,GH,fi0mod,alfaT,betat,ww)
+        GR(I) = DBLE(GCOM)
+        ETAG(I) = DIMAG(GCOM) / DBLE(GCOM)
+        ww = (ww + INCR)
+      END DO
+!
+      return
+!
+      end
+!
+! ---------------------------
+!     parametros equivalentes
+! ----------------------------------------------
+!     tn - tipo de neutralizador
+!     ma - massa auxiliar
+!     ms - massa corpo neutralizador (percussao)
+!     oma - frequencia natural auxiliar wa
+!     rtg - relacao modulos reais  gr(w)/gr(wa)
+!     eta - fator de perda eta(w)
+!     eps - relacao frequencias w/wa
+!     ce - amortecimento viscoso equivalente
+!     me - massa equivalente
+!     sime - se o neutralizador � sim�trico
+! ----------------------------------------------
+      subroutine p_eqv (tn,ma,ms,oma,rtg,eta,eps,ce,me,sime,CP)
+      implicit none
+!     argumentos
+      integer tn,sime,CP
+      real*8  ma,ms,oma,rtg,eta,eps,ce,me
+!     local
+      real*8 dn,nu
+!
+      if (CP.eq.0) then
+! -----------------
+!       simples 1gl
+! -----------------
+        dn = (EPS ** 2. - RTG) ** 2. + (RTG * ETA) ** 2.
+        ce = MA * OMA * RTG * ETA * EPS ** 3. / dn
+        me = -MA * RTG * (EPS ** 2. - RTG * (1.+ ETA ** 2.)) / dn
+      else if(CP .eq. 1) then
+      if(sime.eq.0)then
+! ------------------------------------
+!         centro percussao assimetrico
+! ------------------------------------
+        dn = (RTG - EPS ** 2.) ** 2. + (ETA * RTG) ** 2.
+        me = ((MA + ms) * dn + (RTG - EPS ** 2.) * EPS ** 2. * MA)
+     &          / dn
+        CE = (RTG * ETA * EPS ** 2. * (eps * oma) * MA) / dn
+      else if(sime.eq.1)then
+! ----------------------------------
+!         centro percussao simetrico
+! ----------------------------------
+        dn = (RTG - EPS ** 2.) ** 2. + (ETA * RTG) ** 2.
+        me = 2. * ((MA + ms) * dn + (RTG - EPS ** 2.) * EPS ** 2.
+     &          * MA) / dn
+        CE = 2. * (RTG * ETA * EPS ** 2. * (eps * oma) * MA) / dn
+      end if
+      end if
+!
+      return
+!
+      end
+!**************************************************************
+! ----------------------------------------------
+!     parametros equivalentes - Viscoso/ Hidr�ulico
+! ----------------------------------------------
+!     ma - massa auxiliar
+!     oma - frequencia natural auxiliar wa
+!     csi - amortecimento
+!     eps - relacao frequencias w/wa
+!     ce - amortecimento viscoso equivalente
+!     me - massa equivalente
+! ----------------------------------------------
+      subroutine p_eqv34 (ma,oma,csi,eps,ce,me,sime,CP)
+      implicit none
+!     argumentos
+      integer sime,CP
+      real*8  ma,oma,csi,eps,ce,me
+!     local
+      real*8 dn,nu
+      if(CP.eq.0) then
+        dn = (EPS ** 2. - 1.) ** 2. + (2. * CSI * EPS) ** 2.
+        ce = MA * OMA * 2. * CSI * EPS ** 4. / dn
+        me = -MA * (EPS ** 2. - (1. + (2. * CSI * EPS) ** 2.)) / dn
+      else if (CP .eq. 1) then
+!      if(sime .eq. 0)then
+      !inserir codigo referente ao me e ce do ass
+      if(sime.eq.1) then
+        dn = (EPS ** 2. - 1.) ** 2. + (2. * CSI * EPS) ** 2.
+        ce =2. * MA * OMA * 2. * CSI * EPS ** 4. / dn
+        me =-2. * MA * (EPS ** 2. - (1. + (2. * CSI * EPS) ** 2.)) / dn
+      end if
+      end if
+
+      return
+!
+      end
+
+! ----------------------------------------------
+!     parametros equivalentes - eletromecanico
+! ----------------------------------------------
+!     ma - equivalente � massa auxiliar (ma =(T^2)*C)
+!     oma - frequencia natural auxiliar wa
+!     csi - amortecimento
+!     eps - relacao frequencias w/wa
+!     ce - amortecimento equivalente
+!     me - massa equivalente
+! ----------------------------------------------
+      subroutine p_eqv5 (ma,oma,csi,eps,ce,me,sime,CP)
+      implicit none
+!     argumentos
+      integer sime,CP
+      real*8  ma,oma,csi,eps,ce,me, T, C
+!     local
+      real*8 dn,nu
+
+      if(CP.eq.0) then
+
+        dn = (1. - EPS ** 2.) ** 2. + (2. * CSI * EPS) ** 2.
+        ce = OMA * MA * 2. * CSI * EPS ** 2. / dn
+        me = -MA * (1. - EPS ** 2.) / dn
+
+      else if (CP .eq. 1) then
+!      if(sime .eq. 0)then
+      !inserir codigo referente ao me e ce do ass
+      if(sime.eq.1) then
+         dn = (1. - EPS ** 2.) ** 2. + (2. * CSI * EPS) ** 2.
+        ce = 2. * MA * 2. * CSI * EPS ** 2. / dn
+        me = -2. * MA * (1. - EPS ** 2.) / dn
+      end if
+      end if
+
+!        write(*,*) "ma"
+!        write(*,*) ma
+!        write(*,*) "EPS"
+!        write(*,*) EPS
+!        write(*,*) "CSI"
+!        write(*,*) CSI
+!
+      return
+!
+      end
+! ----------------------------------------------
+!     parametros equivalentes - pendular
+! ----------------------------------------------
+!     ma - equivalente � massa auxiliar
+!     oma - frequencia natural auxiliar wa
+!     eps - relacao frequencias w/wa
+!     rtg - relacao modulos reais  gr(w)/gr(wa)
+!     alpha - relacao entre frequencias naturais wa/wo
+!     R - fator de inercia
+!     ce - amortecimento equivalente
+!     me - massa equivalente
+! ----------------------------------------------
+      subroutine p_eqv6 (ma,oma,rtg,eta,eps,R,ce,me)
+      implicit none
+!     argumentos
+      integer tn,sime,CP
+      real*8  ma,ms,oma,rtg,eta,eps,ce,me,R
+!     local
+      real*8 dn,nu
+
+         dn= ( RTG - EPS ** 2. ) ** 2. + ( ETA * RTG ) ** 2.
+         me = MA * (( RTG - R * EPS ** 2.) * (RTG - EPS ** 2) + ETA** 2.
+     &   * RTG ** 2.)/dn
+         ce = MA * OMA * ETA * RTG * EPS ** 3. * (1-R)/dn
+
+      end
+
+!*****************************************************************
+! ----------------------------------------------
+!     parametros equivalentes - r�gido-viscoelastico
+! ----------------------------------------------
+!     Considerando massa da base igual a zero
+!     ma - massa auxiliar
+!     oma - frequencia natural auxiliar wa
+!     oma2Hz - frequencia natural desconsiderando mat visc (sqrt(k/m))
+!     gr - Modulo de cisalhamento real na freq natural
+!     rtg - relacao modulos reais  gr(w)/gr(wa)
+!     eta - fator de perda eta(w)
+!     eps - relacao frequencias w/wa
+!     ce - amortecimento viscoso equivalente
+!     me - massa equivalente
+! ----------------------------------------------
+      subroutine p_eqv7 (ma,oma,oma2Hz,eps,gr,rtg,eta,ce,me)
+      implicit none
+      real*8 PI
+      parameter (PI = 3.141592653589793)
+!     argumentos
+      real*8  ma,oma,oma2,oma2Hz,eps,gr,rtg,eta,ce,me
+!     local
+      real*8 dn,nu,A2,A3,A4,OM,L,k2
+        OMA2 = OMA2Hz*2*PI
+        k2 = OMA2**2. * ma
+        L = ((OMA**2. * ma) - k2)/gr
+        OM = EPS * OMA
+        A2 =  ma
+        A3 = -OM**2. * ma + k2 + L*RTG*gr
+        A4 = L * RTG * GR * ETA
+
+        if(OMA .gt. OMA2) then
+        dn = A3 ** 2. + A4 ** 2.
+        ce = (- OM * A4 * (A3 * A2 - A2 * (k2 + L * RTG * GR))) / dn
+        me = (A3 * (A2 * (k2 + L * RTG * GR)   ) + A2 * A4 ** 2)/ dn
+
+        else
+        ce = 0.0d0
+        me = 0.0d0
+        endif
+
+      return
+!
+      end
+! ----------------------------------------------
+!     parametros equivalentes - link viscoelastico
+! ----------------------------------------------
+!     xotim - variável a ser otimizada
+!     fgeo - fator de forma (dividido por 2 pi)
+!     eps - relacao frequencias w/wa
+!     gr - Modulo de cisalhamento real na freq natural
+!     rtg - relacao modulos reais  gr(w)/gr(wa)
+!     eta - fator de perda eta(w)
+!     ce - amortecimento equivalente
+!     me - massa equivalente
+! ----------------------------------------------
+      subroutine p_eqv8 (xotim,eps,gr,rtg,eta,ce,me)
+      implicit none
+!     argumentos
+      real*8  xotim,fgeo,gr,rtg,eps,eta,ce,me
+!     local
+      real*8 OM, grw
+         fgeo = xotim / (2. * 3.141592653589793) 
+         OM = eps*xotim
+         grw = rtg*gr
+         me = -fgeo*grw/OM**2
+         ce = fgeo*grw*eta/OM
+      end
+
+
+!*****************************************************************
+
+      ! ------------------------------------
+!     copia um vetor real*8 para outro
+! ------------------------------------
+!     nv - numero de posicoes a copiar
+!     mxv - dimensao dos vetores
+!     vo - vetor de saida
+!     vi - vetor entrada
+! ------------------------------------
+      subroutine cpvec(nv,mxv,vo,vi)
+      implicit none
+!
+      integer nv,mxv
+      real*8 vi(mxv),vo(mxv)
+      integer i
+!
+      DO i = 1,NV
+        vo(i)=vi(i)
+      END DO
+!      write(*,*) "TESTE VALOR DE XBEST FINAL"
+!      write(*,*) Vo
+!
+      return
+!
+      end
+!
+!
+! ------------------------------
+! Corrige vetor projeto com variavel localiza��o
+! ------------------------------
+      SUBROUTINE Correct(XXX)
+!
+      USE MODULO1
+!
+      integer i
+      REAL*8 XXX(mxv)
+!
+      Do i=1,NN
+      XXX(2*NN+i)=int(rand(0)*ng)
+      end do
+!
+      RETURN
+!
+      END
+!
+! ---------------------------------------
+! transforma um numero real em uma string
+! ---------------------------------------
+!     flt - valor a ser convertido
+!     str - string de destino
+!     ok - transformacao ok se = 0
+! ---------------------------------------
+      subroutine floattostr(flt,str,ok)
+!      USE DFPORT, only :rindex
+!      USE PORTLIB, only :rindex
+      implicit none
+!
+      character*(*) :: str
+      character*50 fmt
+      character*24  :: tempstr,exp
+      integer       :: tempint,ok,lenstr,lenfrac,lenexp,ind,ind2,rindx
+      real*8        :: tempflt,flt
+!
+      ok=-1
+
+      write(tempstr,FMT='(ES24.15E3)',err=10)flt !transforma o numero em uma string em qqr formato
+
+      if(flt.ne.0d0)then
+         ind=rindx(tempstr,'E')
+
+         read(tempstr(ind+1:),*)tempint
+         write(exp,*)tempint
+         if((tempint.gt.1).or.(tempint.lt.-2))then
+            lenexp=len_trim(ADJUSTL(exp)) !espaco dos numeros + letra 'E'
+         else
+            lenexp=0
+         endif
+
+         lenstr = len(str)
+
+         if(lenexp .gt. 0.0d0)then
+            lenfrac=lenstr-lenexp-4
+            if(flt.lt.0.0d0)lenfrac=lenfrac-1
+            write(fmt,'(a,i2,a,i2,a,i2,a)')'(ES',lenstr,'.',
+     &      lenfrac,'E',lenexp,')'
+!            write(str,FMT='(ES<lenstr>.<lenfrac>E<lenexp>)',err=10)flt
+            write(str,fmt)flt
+         else
+            lenfrac=lenstr-3
+            if(flt.lt.0.0d0)lenfrac=lenfrac-1
+            write(fmt,'(a,i2,a,i2,a)')'(F',lenstr,'.',lenfrac ,')'
+   !         write(str,FMT='(F<lenstr>.<lenfrac>)',err=10)flt
+            write(str,fmt)flt
+         endif
+      else
+         write(str,'(f2.0)',err=10)flt
+      endif
+
+!write(*,*)'(ES',lenstr,'.',lenfrac,'E',lenexp
+!write(*,'(3a)')'''',tempstr,''''
+!write(*,'(3a)')'''',str,''''
+!write(*,*)
+
+      ok=0
+      return
+
+!10      write(*,*)'erro=',flt
+!      write(*,*)'(ES',lenstr,'.',lenfrac,'E',lenexp
+10    print *,'fmt error->',fmt
+      return
+
+      end subroutine

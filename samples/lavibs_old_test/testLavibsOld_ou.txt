@@ -1,0 +1,57 @@
+27/08/2024 - key [181806]
+*** Resultados da otimizacao ***
+20.000000000000<XBEST> Frequencia natural otima do  neutralizador
+1.0000000000E+3<MA> Massa do neutralizador (kg)
+0              <iter> Iteracoes QNewton
+-2.926093532E+2<fmin> Valor da funcao no ponto        de minimo
+*** Dados da estrutura ***
+3              <NT> Numero de modos identificados
+2              <NG> Numero de graus de liberdade
+0              <TAV> Tipo de autovetor
+N              <TMT> Disposicao da matriz               de autovalores
+*** Modos a neutralizar ***
+1              <NJ> Numero de modos a controlar
+1              <JI> Identificacao dos modos
+0              <TPMU> Tipo de massa modal
+0.100000000000 <MU> Relacao de massas
+*** Funcao objetivo e grafico ***
+1              <TIPOSAI> Funcao objetivo
+1              <TIPOSAII> Tipo de vetor forca
+1              <PF1> Ponto de excitacao da         funcao objetivo
+1              <PX1> Ponto de resposta da          funcao objetivo
+1              <PX0> Ponto de excitacao do         grafico
+1              <PF0> Ponto de resposta do         grafico
+2              <TPGR> Tipo de grafico           de saida
+*** Dados dos neutralizadores ***
+1              <NMNEU> Tipo de neutralizador
+0.             <MS> Massa do nucleo do neutr. com     centro de perc.
+1              <NN> Numero de neutralizadores na      estrutura
+1              <SIME> Simetria do neutralizador
+1              <FROW> posicao nodal dos             neutralizadores
+20.000000000000<X0> frequencia inicial de            otimizacao
+0.             <X0> frequencia inicial de            otimizacao
+*** Dados do Material Viscoelastico ***
+2.9300000000E+2<TT1> Temperatura de trabalho
+2.4300000000E+2<TT0> Temperatura de referencia
+2.4033330000E+6<G0> Assintota inferior
+1.5233330000E+8<Goo> Assintota Superior
+0.417000000000 <BetaT> Coeficiente de derivada       fracionaria
+0.022300000000 <Fi0mod> Coeficiente de derivada     fracionaria
+7.980000000000 <TETA1> Shift factor coeff.
+81.700000000000<TETA2> Shift factor coeff.
+*** Regiao de busca ***
+1.0000000000E+2<OM1> Frequencia limite inferior      de analise
+3.0000000000E+2<OM2> Frequencia limite superior      de analise
+200            <KDIV> Discretizacao da frequencia    na analise
+1.000000000000 <OM1GR> Frequencia limite inferior    de grafico
+60.000000000000<OM2GR> Frequencia limite superior    de grafico
+200            <KDIVGR> Discretizacao da             frequencia no grafico
+1              <PARGR> Operacao de execucao
+2              <TIPO> Tipo de algoritmo de           otimizacao
+1.000000000E-09<RK> QN - fator de ponderacao
+0.010000000000 <FTOL> QN - "limite de                erro"/"criterio de parada"
+30             <NPOP> GA - numero de individuos
+20             <NGER> GA - numero de geracoes
+12             <GAOUT> GA - arquivo de saida
+0.600000000000 <PCRS> Porcentagem de crossover
+0.030000000000 <PMUT> Porcentagem de mutacao

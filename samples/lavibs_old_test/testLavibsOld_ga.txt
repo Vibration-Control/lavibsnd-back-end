@@ -1,0 +1,206 @@
+ Best Ind:   25.618457594531083     
+ Fitness:   292.41254929081117     
+ Best Ind:   21.410260322885829     
+ Fitness:   292.56493378642671     
+ Best Ind:   20.981780449842830     
+ Fitness:   292.57877117193595     
+ Best Ind:   20.508743552964873     
+ Fitness:   292.59370021011796     
+ Best Ind:   20.372325815607166     
+ Fitness:   292.59793831060529     
+
+ Average Values:                       25.18908    292.42183
+ Average Function Value of Generation=   292.42183
+ Maximum Function Value              =   292.59794
+
+
+  Number of Crossovers      =  214
+  Elitist Reproduction on Individual   19
+ Best Ind:   20.358287301248208     
+ Fitness:   292.59837274487256     
+
+ Average Values:                       23.68464    292.47967
+ Average Function Value of Generation=   292.47967
+ Maximum Function Value              =   292.59837
+
+
+  Number of Crossovers      =  229
+  Elitist Reproduction on Individual   23
+ Best Ind:   20.118411816766869     
+ Fitness:   292.60574696594978     
+ Best Ind:   20.105288857692191     
+ Fitness:   292.60614772715257     
+ Best Ind:   20.065309610278636     
+ Fitness:   292.60736695108619     
+
+ Average Values:                       21.41176    292.56302
+ Average Function Value of Generation=   292.56302
+ Maximum Function Value              =   292.60737
+
+
+  Number of Crossovers      =  227
+  Elitist Reproduction on Individual   30
+ Best Ind:   20.046082949308754     
+ Fitness:   292.60795238445070     
+
+ Average Values:                       20.55882    292.59196
+ Average Function Value of Generation=   292.59196
+ Maximum Function Value              =   292.60795
+
+
+  Number of Crossovers      =  226
+  Elitist Reproduction on Individual   28
+ Best Ind:   20.039063692129275     
+ Fitness:   292.60816596672237     
+ Best Ind:   20.020752586443678     
+ Fitness:   292.60872276693851     
+
+ Average Values:                       20.32063    292.59949
+ Average Function Value of Generation=   292.59949
+ Maximum Function Value              =   292.60872
+
+
+  Number of Crossovers      =  223
+ Best Ind:   20.019531846064638     
+ Fitness:   292.60875986788835     
+ Best Ind:   20.001220740379040     
+ Fitness:   292.60931609623520     
+
+ Average Values:                       20.23868    292.60204
+ Average Function Value of Generation=   292.60204
+ Maximum Function Value              =   292.60932
+
+
+  Number of Crossovers      =  230
+  Elitist Reproduction on Individual   29
+
+ Average Values:                       20.14699    292.60486
+ Average Function Value of Generation=   292.60486
+ Maximum Function Value              =   292.60932
+
+
+  Number of Crossovers      =  236
+
+ Average Values:                       20.08256    292.60683
+ Average Function Value of Generation=   292.60683
+ Maximum Function Value              =   292.60932
+
+
+  Number of Crossovers      =  207
+
+ Average Values:                       20.03118    292.60841
+ Average Function Value of Generation=   292.60841
+ Maximum Function Value              =   292.60932
+
+
+  Number of Crossovers      =  215
+ Best Ind:   20.000305185094760     
+ Fitness:   292.60934389358266     
+ Best Ind:   20.000000000000000     
+ Fitness:   292.60935315906744     
+
+ Average Values:                       20.01018    292.60904
+ Average Function Value of Generation=   292.60904
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  213
+
+ Average Values:                       20.00259    292.60927
+ Average Function Value of Generation=   292.60927
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  210
+
+ Average Values:                       20.00163    292.60930
+ Average Function Value of Generation=   292.60930
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  240
+
+ Average Values:                       20.00098    292.60932
+ Average Function Value of Generation=   292.60932
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  208
+
+
+%%%%%%%  Restart micro-population at generation   13  %%%%%%%
+
+ Average Values:                       24.99878    292.42894
+ Average Function Value of Generation=   292.42894
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  232
+  Elitist Reproduction on Individual   24
+
+ Average Values:                       22.76136    292.51632
+ Average Function Value of Generation=   292.51632
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  226
+
+ Average Values:                       21.97376    292.54395
+ Average Function Value of Generation=   292.54395
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  207
+
+ Average Values:                       21.11451    292.57364
+ Average Function Value of Generation=   292.57364
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  239
+
+ Average Values:                       20.56845    292.59151
+ Average Function Value of Generation=   292.59151
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  222
+  Elitist Reproduction on Individual   23
+
+ Average Values:                       20.16447    292.60430
+ Average Function Value of Generation=   292.60430
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  211
+
+ Average Values:                       20.05682    292.60761
+ Average Function Value of Generation=   292.60761
+ Maximum Function Value              =   292.60935
+
+
+  Number of Crossovers      =  219
+
+
+Summary of Output
+  Generation   Evaluations   Avg.Fitness   Best Fitness
+  0.1000E+01    0.3000E+02    0.2924E+03    0.29260E+03
+  0.2000E+01    0.6000E+02    0.2925E+03    0.29260E+03
+  0.3000E+01    0.9000E+02    0.2926E+03    0.29261E+03
+  0.4000E+01    0.1200E+03    0.2926E+03    0.29261E+03
+  0.5000E+01    0.1500E+03    0.2926E+03    0.29261E+03
+  0.6000E+01    0.1800E+03    0.2926E+03    0.29261E+03
+  0.7000E+01    0.2100E+03    0.2926E+03    0.29261E+03
+  0.8000E+01    0.2400E+03    0.2926E+03    0.29261E+03
+  0.9000E+01    0.2700E+03    0.2926E+03    0.29261E+03
+  0.1000E+02    0.3000E+03    0.2926E+03    0.29261E+03
+  0.1100E+02    0.3300E+03    0.2926E+03    0.29261E+03
+  0.1200E+02    0.3600E+03    0.2926E+03    0.29261E+03
+  0.1300E+02    0.3900E+03    0.2926E+03    0.29261E+03
+  0.1400E+02    0.4200E+03    0.2924E+03    0.29261E+03
+  0.1500E+02    0.4500E+03    0.2925E+03    0.29261E+03
+  0.1600E+02    0.4800E+03    0.2925E+03    0.29261E+03
+  0.1700E+02    0.5100E+03    0.2926E+03    0.29261E+03
+  0.1800E+02    0.5400E+03    0.2926E+03    0.29261E+03
+  0.1900E+02    0.5700E+03    0.2926E+03    0.29261E+03
+  0.2000E+02    0.6000E+03    0.2926E+03    0.29261E+03
