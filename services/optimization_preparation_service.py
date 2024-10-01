@@ -1,13 +1,18 @@
 import numpy as np
-from models import objectiveFunctionInput,NeutralizerParameters
+from models import ObjectiveFunctionInput,NeutralizerParameters
 from typing import List
 import pygad
 from services.objective_function_service import objective_function
 
 
-def prepare_objective_function_input(optimization_data):
+def prepare_objective_function_input(optimization_data, plot = False):
 
-    frequencies = np.linspace(optimization_data.objective_function_search_lower_bound, optimization_data.objective_function_search_upper_bound, optimization_data.objective_function_search_discretization)
+    frequencies = 0
+    if(plot):
+        frequencies = np.linspace(optimization_data.plot_lower_bound, optimization_data.plot_upper_bound, optimization_data.plot_discretization)    
+    else:
+        frequencies = np.linspace(optimization_data.objective_function_search_lower_bound, optimization_data.objective_function_search_upper_bound, optimization_data.objective_function_search_discretization)
+
     neutralizers: List[NeutralizerParameters] = []
     for neutralizer in optimization_data.neutralizers:
         neutralizer_parameters = NeutralizerParameters(
@@ -16,19 +21,33 @@ def prepare_objective_function_input(optimization_data):
         neutralizers.append(neutralizer_parameters)
 
     complex_shear_moduluses = []
-    for viscoelastic_material in optimization_data.viscoelastic_materials:
+    for viscoelastic_material in optimization_data.additional_parameters.viscoelastic_materials:
         complex_shear_module = complex_shear_modulus(viscoelastic_material, frequencies)
         complex_shear_moduluses.append(complex_shear_module)
 
-    objective_function_input = objectiveFunctionInput(
+    user_defined_dynamic_stiffnesses = []
+    for user_defined_dynamic_stiffness in optimization_data.additional_parameters.user_defined_dynamic_stiffnesses:
+        user_defined_dynamic_stiffnesses.append(user_defined_dynamic_stiffness.range)
+
+    excitation_node = 0
+    response_node = 0
+    if(plot):
+        excitation_node = optimization_data.excitation_node_plot
+        response_node = optimization_data.response_node_plot
+    else:
+        excitation_node = optimization_data.excitation_node_optimization
+        response_node = optimization_data.response_node_optimization
+
+    objective_function_input = ObjectiveFunctionInput(
         frequencies = frequencies,
         complex_shear_moduluses = complex_shear_moduluses,
+        user_defined_dynamic_stiffnesses = user_defined_dynamic_stiffnesses,
         neutralizers = neutralizers,
         primary_system_natural_frequencies = optimization_data.primary_system_natural_frequencies,
         primary_system_modal_damping = optimization_data.primary_system_modal_damping,
         primary_system_modes = optimization_data.primary_system_modes,
-        excitation_node_optimization = optimization_data.excitation_node_optimization,
-        response_node_optimization = optimization_data.response_node_optimization
+        excitation_node_optimization = excitation_node,
+        response_node_optimization = response_node
     )
 
     return objective_function_input
@@ -62,36 +81,8 @@ def insert_neutralizers(objective_function_input,ga_variables_values,ga_variable
 
     return objective_function_input
 
-def prepare_plot_input(optimization_data):
-
-    frequencies = np.linspace(optimization_data.plot_lower_bound, optimization_data.plot_upper_bound, optimization_data.plot_discretization)
-    neutralizers: List[NeutralizerParameters] = []
-    for neutralizer in optimization_data.neutralizers:
-        neutralizer_parameters = NeutralizerParameters(
-            mass = neutralizer.mass
-        )
-        neutralizers.append(neutralizer_parameters)
-
-    complex_shear_moduluses = []
-    for viscoelastic_material in optimization_data.viscoelastic_materials:
-        complex_shear_module = complex_shear_modulus(viscoelastic_material, frequencies)
-        complex_shear_moduluses.append(complex_shear_module)
-
-    plot_input = objectiveFunctionInput(
-        frequencies = frequencies,
-        complex_shear_moduluses = complex_shear_moduluses,
-        neutralizers = neutralizers,
-        primary_system_natural_frequencies = optimization_data.primary_system_natural_frequencies,
-        primary_system_modal_damping = optimization_data.primary_system_modal_damping,
-        primary_system_modes = optimization_data.primary_system_modes,
-        excitation_node_optimization = optimization_data.excitation_node_plot,
-        response_node_optimization = optimization_data.response_node_plot
-    )
-
-    return plot_input
-
 def optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer):
-    plot_input = prepare_plot_input(optimization_input)
+    plot_input = prepare_objective_function_input(optimization_input, plot = True)
     plot_input_with_neutralizers = insert_neutralizers(plot_input, solution, gene_name, gene_per_neutralizer)
     receptance = objective_function(plot_input_with_neutralizers, True)
     return receptance

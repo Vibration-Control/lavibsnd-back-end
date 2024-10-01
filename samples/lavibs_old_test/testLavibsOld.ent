@@ -29,7 +29,7 @@ N              [TMT] Disposi��o da Matriz FI (N=Normal e T=Transposto)
 20.000000      [X0( )] Freq��ncias naturais dos neutralizadores
 1.000000       [X0( )] CSI dos neutralizadores
 20.000000      [DK( )] Restri��o inferior e superior de cada componente
-30.000000      [DK( )] Restri��o inferior e superior de cada componente
+20.000001      [DK( )] Restri��o inferior e superior de cada componente
 70.905500      [DK( )] Restri��o inferior e superior para o CSI
 70.905600      [DK( )] Restri��o inferior e superior para o CSI
 *** Dados Materiais ViscoEl�sticos ***

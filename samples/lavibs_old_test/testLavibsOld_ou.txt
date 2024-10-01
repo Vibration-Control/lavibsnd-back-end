@@ -1,4 +1,4 @@
-27/08/2024 - key [181806]
+01/10/2024 - key [19150] 
 *** Resultados da otimizacao ***
 20.000000000000<XBEST> Frequencia natural otima do  neutralizador
 1.0000000000E+3<MA> Massa do neutralizador (kg)
