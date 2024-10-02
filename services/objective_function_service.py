@@ -6,14 +6,14 @@ def objective_function(optimization_data, plot = False):
     number_of_neutralizers = len(optimization_data.neutralizers)
     number_of_modes = len(optimization_data.primary_system_natural_frequencies)
     frequency_discretization = len(optimization_data.frequencies)
-    modal_mass_array = np.zeros((number_of_modes, number_of_modes), dtype=complex)
-    modal_damp_array = np.zeros((number_of_modes, number_of_modes), dtype=complex)
     composed_system_stiffness = np.zeros((number_of_modes, number_of_modes), dtype=complex)
     receptance = np.zeros(frequency_discretization, dtype=complex)
     
     complex_shear_module_per_neutralizer, frequency_index_per_neutralizer, loss_factor_per_neutralizer = calculate_viscoelastic_properties(optimization_data, number_of_neutralizers)
 
     for i in range(frequency_discretization):
+        modal_mass_array = np.zeros((number_of_modes, number_of_modes), dtype=complex)
+        modal_damp_array = np.zeros((number_of_modes, number_of_modes), dtype=complex)
         for j in range(number_of_modes):
             for k in range(number_of_modes):
                 for l in range(number_of_neutralizers):
@@ -24,7 +24,7 @@ def objective_function(optimization_data, plot = False):
         for j in range(number_of_modes):
             primary_system_stiffness = complex(optimization_data.primary_system_natural_frequencies[j]**2 - optimization_data.frequencies[i]**2, optimization_data.primary_system_natural_frequencies[j]**2 * optimization_data.primary_system_modal_damping[j])
             for k in range(number_of_modes):
-                modal_stiffness = -optimization_data.frequencies[i]**2 * modal_mass_array[j][k] + complex(0,optimization_data.frequencies[i] * modal_damp_array[j][k]) 
+                modal_stiffness = complex(-optimization_data.frequencies[i]**2 * modal_mass_array[j][k],optimization_data.frequencies[i] * modal_damp_array[j][k]) 
                 composed_system_stiffness[j][k] = modal_stiffness
                 if (j==k):
                     composed_system_stiffness[j][k] = modal_stiffness + primary_system_stiffness
