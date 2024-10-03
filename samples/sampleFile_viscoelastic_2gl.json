@@ -1,0 +1,94 @@
+  {
+    "primarySystemNaturalFrequencies": [
+      10,
+      20,
+      40
+    ],
+    "primarySystemModalDamping": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "primarySystemModes": [
+      [
+        0.01,
+        0.01
+      ],
+      [
+        0.01,
+        0.01
+      ],
+      [
+        0.01,
+        0.01
+      ]
+    ],
+    "excitationNodeOptimization": 1,
+    "responseNodeOptimization": 1,
+    "excitationNodePlot": 1,
+    "responseNodePlot": 1,
+    "plotType": 1,
+    "neutralizers": [
+      {
+        "mass": 0.0,
+        "optimizationVariables": {
+          "real": [
+            {
+              "name": "frequency",
+              "lowerBound": 20,
+              "upperBound": 20,
+              "discretization": 200
+            }
+          ],
+          "integer": [
+            {
+              "name": "type",
+              "range": [
+                1
+              ]
+            },
+            {
+              "name": "modal_position",
+              "range": [
+                1
+              ]
+            },
+            {
+              "name": "viscoelastic_material",
+              "range": [
+                0
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "additionalParameters": {
+      "viscoelasticMaterials": [
+        {
+          "name": "Elastomero BT 806/55",
+          "TT1": 293,
+          "TT0": 243,
+          "GH": 15233333,
+          "GL": 240333,
+          "beta": 0.417,
+          "FI": 0.0223,
+          "teta1": 7.98,
+          "teta2": 81.7
+        }
+      ],
+      "userDefinedDynamicStiffnesses": []
+    },
+    "objectiveFunctionSearchLowerBound": 10,
+    "objectiveFunctionSearchUpperBound": 30,
+    "objectiveFunctionSearchDiscretization": 200,
+    "plotLowerBound": 1,
+    "plotUpperBound": 60,
+    "plotDiscretization": 200,
+    "geneticAlgorithm": {
+      "populationSize": 5,
+      "generations": 20,
+      "crossover": 60,
+      "mutation": 5
+    }
+  }

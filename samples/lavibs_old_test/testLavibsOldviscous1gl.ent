@@ -1,8 +1,8 @@
 *** Dados da Estrutura ***
 [parametros modais] proxima linha nome do arquivo de entrada
-test_lavibs_old.eig
+test_lavibs_old1gl.eig
 3              [NT] Número de modos identificados
-2              [NG] Número de graus de liberdade
+1              [NG] Número de graus de liberdade
 0              [TAV] Tipo de autovetor (0=ANSYS, 1=ICATS)
 N              [TMT] Disposição da Matriz FI (N=Normal e T=Transposto)
 *** Modos a neutralizar ***
@@ -20,18 +20,18 @@ N              [TMT] Disposição da Matriz FI (N=Normal e T=Transposto)
 1              [PX0] Ponto de resposta para graficar
 2              [TPGR] Tipo de gráfico (0=I, 1=M, 2=R)
 *** Dados dos neutralizadores ***
-1              [NMNEU] modelo de neutralizador utilizado no calculo
+2              [NMNEU] modelo de neutralizador utilizado no calculo
 0.000000E+00   [MS] Massa do núcleo (no caso de neutr. com centro de percuss o)
 1              [NN] Número de neutralizadores
 0              [CP] define o Centro de Percuss o do Neutralizador (0=Sem CP, 1=Com CP)
 1              [SIMETRIA] define simetria do neutralizador (0=assimetrico, 1=simetrico)
 1              [FROW( )] Posição dos neutralizadores
-20.000000      [X0( )] Freqüências naturais dos neutralizadores
+10.000000      [X0( )] Freqüências naturais dos neutralizadores
 1.000000       [X0( )] CSI dos neutralizadores
 20.000000      [DK( )] Restrição inferior e superior de cada componente
 20.000001      [DK( )] Restrição inferior e superior de cada componente
-70.905500      [DK( )] Restrição inferior e superior para o CSI
-70.905600      [DK( )] Restrição inferior e superior para o CSI
+0.0010000      [DK( )] Restrição inferior e superior para o CSI
+0.0010000      [DK( )] Restrição inferior e superior para o CSI
 *** Dados Materiais ViscoElásticos ***
 2.930000E+02   [TT1] Milena
 2.430000E+02   [TT0] Milena

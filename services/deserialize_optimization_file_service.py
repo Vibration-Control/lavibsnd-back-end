@@ -1,7 +1,7 @@
 import json
 from typing import List
 import numpy as np
-from models import InputData, IntegerVariable, RealVariable, OptimizationVariables, Neutralizer, GeneticAlgorithm, ViscoelasticMaterial  # Adjust import path as needed
+from models import InputData, IntegerVariable, RealVariable, DynamicStiffnessVariable, OptimizationVariables, Neutralizer, GeneticAlgorithm, ViscoelasticMaterial, AdditionalParameters  # Adjust import path as needed
 
 def deserialize_optimization_file(json_data) -> InputData:
     json_payload_str = json.dumps(json_data)
@@ -18,17 +18,20 @@ def deserialize_optimization_file(json_data) -> InputData:
             discretization=item['discretization']
         )
 
+    def parse_dynamic_stiffness_variable(item):
+        return DynamicStiffnessVariable(name=item['name'], range=item['range'])
+
     def parse_viscoelastic_material(item):
         return ViscoelasticMaterial(
             name=item['name'],
-            TT1=item['TT1'],
-            TT0=item['TT0'],
-            GH=item['GH'],
-            GL=item['GL'],
-            beta=item['beta'],
-            FI=item['FI'],
-            teta1=item['teta1'],
-            teta2=item['teta2']
+            TT1=item.get('TT1', 0),
+            TT0=item.get('TT0', 0),
+            GH=item.get('GH', 0),
+            GL=item.get('GL', 0),
+            beta=item.get('beta', 0.0),
+            FI=item.get('FI', 0.0),
+            teta1=item.get('teta1', 0.0),
+            teta2=item.get('teta2', 0.0)
         )
 
     def parse_optimization_variables(data):
@@ -48,8 +51,18 @@ def deserialize_optimization_file(json_data) -> InputData:
             mutation=data['mutation']
         )
 
+    def parse_additional_parameters(data):
+        user_defined_dynamic_stiffnesses = [parse_dynamic_stiffness_variable(item) for item in data['userDefinedDynamicStiffnesses']]
+        viscoelastic_materials = [parse_viscoelastic_material(item) for item in data['viscoelasticMaterials']]
+        return AdditionalParameters(user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses, viscoelastic_materials=viscoelastic_materials)
+
+    # Parse neutralizers
     neutralizers = [parse_neutralizer(item) for item in data['neutralizers']]
-    viscoelastic_materials = [parse_viscoelastic_material(item) for item in data['viscoelasticMaterials']]
+
+    # Parse additional parameters
+    additional_parameters = parse_additional_parameters(data['additionalParameters'])
+
+    # Parse genetic algorithm
     genetic_algorithm = parse_genetic_algorithm(data['geneticAlgorithm'])
 
     input_data = InputData(
@@ -62,7 +75,7 @@ def deserialize_optimization_file(json_data) -> InputData:
         response_node_plot=data['responseNodePlot'],
         plot_type=data['plotType'],
         neutralizers=neutralizers,
-        viscoelastic_materials=viscoelastic_materials,
+        additional_parameters=additional_parameters,
         objective_function_search_lower_bound=data['objectiveFunctionSearchLowerBound']*2*np.pi,
         objective_function_search_upper_bound=data['objectiveFunctionSearchUpperBound']*2*np.pi,
         objective_function_search_discretization=data['objectiveFunctionSearchDiscretization'],
@@ -71,5 +84,5 @@ def deserialize_optimization_file(json_data) -> InputData:
         plot_discretization=data['plotDiscretization'],
         genetic_algorithm=genetic_algorithm
     )
-    
+
     return input_data

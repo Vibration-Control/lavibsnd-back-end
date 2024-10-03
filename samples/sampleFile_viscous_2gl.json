@@ -11,19 +11,22 @@
   ],
   "primarySystemModes": [
     [
+      0.01,
       0.01
     ],
     [
+      0.01,
       0.01
     ],
     [
+      0.01,
       0.01
     ]
   ],
-  "excitationNodeOptimization": 0,
-  "responseNodeOptimization": 0,
-  "excitationNodePlot": 0,
-  "responseNodePlot": 0,
+  "excitationNodeOptimization": 1,
+  "responseNodeOptimization": 1,
+  "excitationNodePlot": 1,
+  "responseNodePlot": 1,
   "plotType": 1,
   "neutralizers": [
     {
@@ -53,7 +56,8 @@
           {
             "name": "modal_position",
             "range": [
-              0
+              0,
+              1
             ]
           }
         ]
@@ -69,7 +73,7 @@
   "objectiveFunctionSearchDiscretization": 200,
   "plotLowerBound": 1,
   "plotUpperBound": 60,
-  "plotDiscretization": 200,
+  "plotDiscretization": 2000,
   "geneticAlgorithm": {
     "populationSize": 5,
     "generations": 20,

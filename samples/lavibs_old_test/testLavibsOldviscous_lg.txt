@@ -1,0 +1,9 @@
+02/10/2024 - key [110023]
+MSG (14:05:18.0): init     -> ok!
+MSG (14:05:18.0): input    -> ok!
+MSG (14:05:18.0): prepr    -> ok!
+MSG (14:05:18.0): obj. func-> 1
+MSG (14:05:18.8): ga       -> ok!
+MSG (14:05:18.9): graph    -> ok!
+MSG (14:05:18.9): outpt    -> ok!
+MSG (14:05:18.9): finish   -> ok!

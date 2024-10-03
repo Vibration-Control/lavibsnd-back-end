@@ -1,9 +1,10 @@
-02/10/2024 - key [19573] 
+02/10/2024 - key [110023]
 *** Resultados da otimizacao ***
-20.000000000000<XBEST> Frequencia natural otima do  neutralizador
+20.000000007874<XBEST> Frequencia natural otima do  neutralizador
+1.000000000E-03<KSIBEST> Amortecimeno otimo do   neutralizador
 1.0000000000E+3<MA> Massa do neutralizador (kg)
 0              <iter> Iteracoes QNewton
--2.926093532E+2<fmin> Valor da funcao no ponto        de minimo
+-2.926808422E+2<fmin> Valor da funcao no ponto        de minimo
 *** Dados da estrutura ***
 3              <NT> Numero de modos identificados
 2              <NG> Numero de graus de liberdade
@@ -23,13 +24,13 @@ N              <TMT> Disposicao da matriz               de autovalores
 1              <PF0> Ponto de resposta do         grafico
 2              <TPGR> Tipo de grafico           de saida
 *** Dados dos neutralizadores ***
-1              <NMNEU> Tipo de neutralizador
+2              <NMNEU> Tipo de neutralizador
 0.             <MS> Massa do nucleo do neutr. com     centro de perc.
 1              <NN> Numero de neutralizadores na      estrutura
 1              <SIME> Simetria do neutralizador
 1              <FROW> posicao nodal dos             neutralizadores
-20.000000000000<X0> frequencia inicial de            otimizacao
-0.             <X0> frequencia inicial de            otimizacao
+20.000000007874<X0> frequencia inicial de            otimizacao
+1.000000000E-03<X0> frequencia inicial de            otimizacao
 *** Dados do Material Viscoelastico ***
 2.9300000000E+2<TT1> Temperatura de trabalho
 2.4300000000E+2<TT0> Temperatura de referencia

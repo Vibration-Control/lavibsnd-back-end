@@ -1,15 +1,23 @@
 {
-  "primarySystemNaturalFrequencies": [10,20,40],
-  "primarySystemModalDamping": [0.01,0.01,0.01],
-  "primarySystemModes": [[0.1,0.1],[0.1,0.1],[0.1,0.1]],
-  "excitationNodeOptimization": 1,
-  "responseNodeOptimization": 1,
-  "excitationNodePlot": 1,
-  "responseNodePlot": 1,
+  "primarySystemNaturalFrequencies": [
+    20
+  ],
+  "primarySystemModalDamping": [
+    0.01
+  ],
+  "primarySystemModes": [
+    [
+      0.01
+    ]
+  ],
+  "excitationNodeOptimization": 0,
+  "responseNodeOptimization": 0,
+  "excitationNodePlot": 0,
+  "responseNodePlot": 0,
   "plotType": 1,
   "neutralizers": [
     {
-      "mass": 10.0,
+      "mass": 100.0,
       "optimizationVariables": {
         "real": [
           {
@@ -17,23 +25,23 @@
             "lowerBound": 20,
             "upperBound": 20,
             "discretization": 200
+          },
+          {
+            "name": "damp",
+            "lowerBound": 0.001,
+            "upperBound": 0.001,
+            "discretization": 100
           }
         ],
         "integer": [
           {
-              "name": "type",
-              "range": [
-                1
-              ]
-          },
-          {
-            "name": "modal_position",
+            "name": "type",
             "range": [
-              1
+              2
             ]
           },
           {
-            "name": "viscoelastic_material",
+            "name": "modal_position",
             "range": [
               0
             ]
@@ -42,19 +50,10 @@
       }
     }
   ],
-  "viscoelasticMaterials":[
-    {
-      "name": "Elastomero BT 806/55",
-      "TT1": 293,
-      "TT0": 243,
-      "GH":15233333,
-      "GL":240333,
-      "beta":0.417,
-      "FI": 0.0223,
-      "teta1": 7.98,
-      "teta2": 81.7
-    }
-  ],
+  "additionalParameters": {
+    "viscoelasticMaterials": [],
+    "userDefinedDynamicStiffnesses": []
+  },
   "objectiveFunctionSearchLowerBound": 10,
   "objectiveFunctionSearchUpperBound": 30,
   "objectiveFunctionSearchDiscretization": 200,
