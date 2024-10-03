@@ -1,13 +1,13 @@
-02/10/2024 - key [110023]
+02/10/2024 - key [111533]
 *** Resultados da otimizacao ***
 20.000000007874<XBEST> Frequencia natural otima do  neutralizador
 1.000000000E-03<KSIBEST> Amortecimeno otimo do   neutralizador
 1.0000000000E+3<MA> Massa do neutralizador (kg)
 0              <iter> Iteracoes QNewton
--2.926808422E+2<fmin> Valor da funcao no ponto        de minimo
+-3.036065309E+2<fmin> Valor da funcao no ponto        de minimo
 *** Dados da estrutura ***
-3              <NT> Numero de modos identificados
-2              <NG> Numero de graus de liberdade
+1              <NT> Numero de modos identificados
+1              <NG> Numero de graus de liberdade
 0              <TAV> Tipo de autovetor
 N              <TMT> Disposicao da matriz               de autovalores
 *** Modos a neutralizar ***

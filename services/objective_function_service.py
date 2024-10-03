@@ -25,7 +25,7 @@ def objective_function(optimization_data, plot = False):
             primary_system_stiffness = complex(optimization_data.primary_system_natural_frequencies[j]**2 - optimization_data.frequencies[i]**2, optimization_data.primary_system_natural_frequencies[j]**2 * optimization_data.primary_system_modal_damping[j])
             for k in range(number_of_modes):
                 modal_stiffness = complex(-optimization_data.frequencies[i]**2 * modal_mass_array[j][k],optimization_data.frequencies[i] * modal_damp_array[j][k]) 
-                composed_system_stiffness[j][k] = modal_stiffness
+                composed_system_stiffness[j][k] =  modal_stiffness
                 if (j==k):
                     composed_system_stiffness[j][k] = modal_stiffness + primary_system_stiffness
         inverse_composed_system_matrix = np.linalg.inv(composed_system_stiffness)

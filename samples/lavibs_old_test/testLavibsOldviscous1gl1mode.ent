@@ -1,0 +1,61 @@
+*** Dados da Estrutura ***
+[parametros modais] proxima linha nome do arquivo de entrada
+test_lavibs_old1gl.eig
+1              [NT] Número de modos identificados
+1              [NG] Número de graus de liberdade
+0              [TAV] Tipo de autovetor (0=ANSYS, 1=ICATS)
+N              [TMT] Disposição da Matriz FI (N=Normal e T=Transposto)
+*** Modos a neutralizar ***
+1              [NJ] Quantidade de modos a neutralizar na faixa de interesse
+1              [JI( )]
+0              [TPMU] Tipo de massa (cte do neutralizador ou calculado pelos modos)
+0.100000       [MU( )] Massa modal dos neutralizadores
+35.0           [MASP( )] Massa do sistema primário
+*** Fun  o objetivo e grafico ***
+1              [TIPOSAI] Tipo de função objetivo
+1              [TIPOSAII] Tipo de resposta no gr fico (1=pontual,2=distribuida)
+1              [PF1] Ponto de excitação
+1              [PX1] Ponto de resposta
+1              [PF0] Ponto de excitação para graficar
+1              [PX0] Ponto de resposta para graficar
+2              [TPGR] Tipo de gráfico (0=I, 1=M, 2=R)
+*** Dados dos neutralizadores ***
+2              [NMNEU] modelo de neutralizador utilizado no calculo
+0.000000E+00   [MS] Massa do núcleo (no caso de neutr. com centro de percuss o)
+1              [NN] Número de neutralizadores
+0              [CP] define o Centro de Percuss o do Neutralizador (0=Sem CP, 1=Com CP)
+1              [SIMETRIA] define simetria do neutralizador (0=assimetrico, 1=simetrico)
+1              [FROW( )] Posição dos neutralizadores
+10.000000      [X0( )] Freqüências naturais dos neutralizadores
+1.000000       [X0( )] CSI dos neutralizadores
+20.000000      [DK( )] Restrição inferior e superior de cada componente
+20.000001      [DK( )] Restrição inferior e superior de cada componente
+0.0010000      [DK( )] Restrição inferior e superior para o CSI
+0.0010000      [DK( )] Restrição inferior e superior para o CSI
+*** Dados Materiais ViscoElásticos ***
+2.930000E+02   [TT1] Milena
+2.430000E+02   [TT0] Milena
+2.403333E+06   [GL] Milena
+1.523333E+08   [GH] Milena
+4.170000E-01   [BETA] Milena
+2.230000E-02   [FI] Milena
+7.980000E+00   [TETA1] Milena
+8.170000E+01   [TETA2] Milena
+*** Regi o de busca ***
+1.000000E+02   [OM1] Frequência Inferior da faixa a analisar
+3.000000E+02   [OM2] Frequência Superior da faixa a analisar
+2.000000E+02   [KDIV] Número de pontos entre OM1 e OM2
+1.000000E+00   [OM1GR] Frequência Inferior da faixa para graficar
+6.000000E+01   [OM2GR] Frequência Superior da faixa para graficar
+2.000000E+02   [KDIVGR] Discretização da freqüência
+*** Método de otimização ***
+1              [PARGR] 0 = Graficar, 1 = otimizar e graficar
+2              [TIPO] 1 = QN, 2 = AG, 3 = QN + AG
+1.000000E-09   [RK] Parâmetro de ponderação
+1.000000E-02   [FTOL] Critério de parada
+30             [NPOP] Número de indivíduos
+20             [NGER] Número de gerações
+1              [GAOUT] 0=Sem saida, 1=Saida do GA ativada
+6.000000E-01   [pcrs] Porcentagem de crossover
+3.000000E-02   [pmut] Porcentagem de mutação
+0

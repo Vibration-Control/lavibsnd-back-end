@@ -1,21 +1,11 @@
 {
   "primarySystemNaturalFrequencies": [
-    10,
-    20,
-    40
+    20
   ],
   "primarySystemModalDamping": [
-    0.01,
-    0.01,
     0.01
   ],
   "primarySystemModes": [
-    [
-      0.01
-    ],
-    [
-      0.01
-    ],
     [
       0.01
     ]
