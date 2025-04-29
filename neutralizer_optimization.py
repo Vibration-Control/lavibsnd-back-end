@@ -4,16 +4,31 @@ import numpy as np
 
 def neutralizer_optimization(data):
     optimization_input = deserialize_optimization_file(data)
-    ga_instance,gene_name,gene_per_neutralizer = ga_preparation(optimization_input)
+    ga_instance, gene_name, gene_per_neutralizer = ga_preparation(optimization_input)
     
     # Run the GA
     ga_instance.run()
 
-    # Print the best solution found
+    # Get the best solution
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print(f"Best solution: {solution}, Fitness: {solution_fitness}")
     
     optimal_receptance = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
-    output = 20*np.log10(abs(optimal_receptance))
+    output = 20 * np.log10(abs(optimal_receptance))
 
-    return output.tolist()
+    # Recompute frequencies based on plot bounds
+    frequencies = np.linspace(
+        optimization_input.plot_lower_bound,
+        optimization_input.plot_upper_bound,
+        optimization_input.plot_discretization
+    ) / (2 * np.pi)  # Convert from rad/s to Hz
+
+    # Prepare the result dictionary
+    result = {
+        "solution": solution.tolist(),  # Convert numpy array to list
+        "solutionFitness": solution_fitness,
+        "frequency": frequencies.tolist(),  # Use recomputed frequencies
+        "frf": output.tolist()
+    }
+
+    return result
