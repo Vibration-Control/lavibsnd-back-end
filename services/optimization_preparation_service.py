@@ -3,7 +3,7 @@ from models import ObjectiveFunctionInput,NeutralizerParameters
 from typing import List
 import pygad
 from services.objective_function_service import objective_function
-
+from services.primary_system_service import primary_system_response
 
 def prepare_objective_function_input(optimization_data, plot = False):
 
@@ -84,8 +84,9 @@ def insert_neutralizers(objective_function_input,ga_variables_values,ga_variable
 def optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer):
     plot_input = prepare_objective_function_input(optimization_input, plot = True)
     plot_input_with_neutralizers = insert_neutralizers(plot_input, solution, gene_name, gene_per_neutralizer)
-    receptance = objective_function(plot_input_with_neutralizers, True)
-    return receptance
+    composed_system_receptance = objective_function(plot_input_with_neutralizers, True)
+    primary_system_receptance = primary_system_response(plot_input_with_neutralizers)
+    return composed_system_receptance,primary_system_receptance
 
 def ga_preparation(optimization_input):
     objective_function_input = prepare_objective_function_input(optimization_input)

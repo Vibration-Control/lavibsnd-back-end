@@ -1,5 +1,6 @@
 from services.deserialize_optimization_file_service import deserialize_optimization_file
 from services.optimization_preparation_service import ga_preparation, optimal_solution
+
 import numpy as np
 
 def neutralizer_optimization(data):
@@ -13,8 +14,9 @@ def neutralizer_optimization(data):
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print(f"Best solution: {solution}, Fitness: {solution_fitness}")
     
-    optimal_receptance = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
-    output = 20 * np.log10(abs(optimal_receptance))
+    optimal_receptance, primary_system_receptance = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
+    primary_system_frf = 20 * np.log10(abs(primary_system_receptance))
+    composed_system_frf = 20 * np.log10(abs(optimal_receptance))
 
     # Recompute frequencies based on plot bounds
     frequencies = np.linspace(
@@ -28,7 +30,8 @@ def neutralizer_optimization(data):
         "solution": solution.tolist(),  # Convert numpy array to list
         "solutionFitness": solution_fitness,
         "frequency": frequencies.tolist(),  # Use recomputed frequencies
-        "frf": output.tolist()
+        "primary_system_frf": primary_system_frf.tolist(),
+        "composed_system_frf": composed_system_frf.tolist()
     }
 
     return result
