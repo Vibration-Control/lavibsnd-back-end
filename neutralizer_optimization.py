@@ -25,13 +25,42 @@ def neutralizer_optimization(data):
         optimization_input.plot_discretization
     ) / (2 * np.pi)  # Convert from rad/s to Hz
 
+    # Convert flat gene/solution list into structured neutralizer-wise dictionary
+    structured_solution = []
+    i = 0  # start index for slicing gene_name and solution
+
+    for genes_in_neutralizer in gene_per_neutralizer:
+        gene_slice = gene_name[i:i + genes_in_neutralizer]
+        value_slice = solution[i:i + genes_in_neutralizer]
+
+        # Find the neutralizer type from the value slice (based on position of "type")
+        type_index = gene_slice.index("type")
+        neutralizer_type = int(value_slice[type_index])
+
+        if neutralizer_type == 1:
+            keys = ["frequency", "type", "modal_position", "viscoelastic_material"]
+        elif neutralizer_type == 2:
+            keys = ["frequency", "damp", "type", "modal_position"]
+        elif neutralizer_type == 0:
+            keys = ["frequency", "damp", "type", "modal_position"]
+        else:
+            raise ValueError(f"Unknown neutralizer type {neutralizer_type}")
+
+        # Build dictionary using only relevant keys from gene_slice and value_slice
+        neutralizer_dict = {k: v for k, v in zip(gene_slice, value_slice)}
+        structured_solution.append(neutralizer_dict)
+
+        i += genes_in_neutralizer  # move to next neutralizer
+
+
     # Prepare the result dictionary
     result = {
-        "solution": solution.tolist(),  # Convert numpy array to list
+        "solution": structured_solution,
         "solutionFitness": solution_fitness,
-        "frequency": frequencies.tolist(),  # Use recomputed frequencies
+        "frequency": frequencies.tolist(),
         "primary_system_frf": primary_system_frf.tolist(),
-        "composed_system_frf": composed_system_frf.tolist()
+        "composed_system_frf": composed_system_frf.tolist(),
+        "gene_name": gene_name
     }
 
     return result
