@@ -28,29 +28,45 @@ def neutralizer_optimization(data):
     # Convert flat gene/solution list into structured neutralizer-wise dictionary
     structured_solution = []
     i = 0  # start index for slicing gene_name and solution
+    viscoelastic_materials = optimization_input.additional_parameters.viscoelastic_materials
 
-    for genes_in_neutralizer in gene_per_neutralizer:
+    for idx, genes_in_neutralizer in enumerate(gene_per_neutralizer):
         gene_slice = gene_name[i:i + genes_in_neutralizer]
         value_slice = solution[i:i + genes_in_neutralizer]
 
-        # Find the neutralizer type from the value slice (based on position of "type")
+        # Determine neutralizer type
         type_index = gene_slice.index("type")
         neutralizer_type = int(value_slice[type_index])
 
+        # Default keys depending on type
         if neutralizer_type == 1:
             keys = ["frequency", "type", "modal_position", "viscoelastic_material"]
-        elif neutralizer_type == 2:
-            keys = ["frequency", "damp", "type", "modal_position"]
-        elif neutralizer_type == 0:
+        elif neutralizer_type in (0, 2):
             keys = ["frequency", "damp", "type", "modal_position"]
         else:
             raise ValueError(f"Unknown neutralizer type {neutralizer_type}")
 
-        # Build dictionary using only relevant keys from gene_slice and value_slice
         neutralizer_dict = {k: v for k, v in zip(gene_slice, value_slice)}
-        structured_solution.append(neutralizer_dict)
 
-        i += genes_in_neutralizer  # move to next neutralizer
+        # Add viscoelastic material properties if needed
+        if neutralizer_type == 1:
+            visco_index = int(neutralizer_dict.get("viscoelastic_material", -1))
+            if 0 <= visco_index < len(viscoelastic_materials):
+                neutralizer_dict["viscoelastic_material"] = viscoelastic_materials[visco_index].__dict__
+            else:
+                raise IndexError(f"Viscoelastic material index {visco_index} out of range.")
+
+        # ✅ Add mass to neutralizer_dict
+        try:
+            neutralizer_mass = optimization_input.neutralizers[idx].mass
+        except (IndexError, AttributeError):
+            raise ValueError(f"Missing or invalid mass for neutralizer index {idx}")
+        
+        neutralizer_dict["mass"] = neutralizer_mass
+
+        structured_solution.append(neutralizer_dict)
+        i += genes_in_neutralizer
+
 
 
     # Prepare the result dictionary
@@ -59,8 +75,7 @@ def neutralizer_optimization(data):
         "solutionFitness": solution_fitness,
         "frequency": frequencies.tolist(),
         "primary_system_frf": primary_system_frf.tolist(),
-        "composed_system_frf": composed_system_frf.tolist(),
-        "gene_name": gene_name
+        "composed_system_frf": composed_system_frf.tolist()
     }
 
     return result
