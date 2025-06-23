@@ -14,7 +14,7 @@ def neutralizer_optimization(data):
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print(f"Best solution: {solution}, Fitness: {solution_fitness}")
     
-    optimal_receptance, primary_system_receptance = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
+    optimal_receptance, primary_system_receptance, optimezed_neutralizer = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
     primary_system_frf = 20 * np.log10(abs(primary_system_receptance))
     composed_system_frf = 20 * np.log10(abs(optimal_receptance))
 
@@ -58,7 +58,7 @@ def neutralizer_optimization(data):
 
         # ✅ Add mass to neutralizer_dict
         try:
-            neutralizer_mass = optimization_input.neutralizers[idx].mass
+            neutralizer_mass = optimezed_neutralizer[idx].mass
         except (IndexError, AttributeError):
             raise ValueError(f"Missing or invalid mass for neutralizer index {idx}")
         

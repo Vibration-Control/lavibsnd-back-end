@@ -1,28 +1,28 @@
   {
-    "primarySystemNaturalFrequencies": [
-      10,
-      20,
-      40
-    ],
-    "primarySystemModalDamping": [
-      0.01,
-      0.01,
-      0.01
-    ],
-    "primarySystemModes": [
-      [
-        0.1,
-        0.1
+      "primarySystemNaturalFrequencies": [
+        10,
+        20,
+        40
       ],
-      [
-        0.1,
-        0.1
+      "primarySystemModalDamping": [
+        0.01,
+        0.01,
+        0.01
       ],
-      [
-        0.1,
-        0.1
-      ]
-    ],
+      "primarySystemModes": [
+        [
+          0.1,
+          0.1
+        ],
+        [
+          0.1,
+          0.1
+        ],
+        [
+          0.1,
+          0.1
+        ]
+      ],
     "excitationNodeOptimization": 1,
     "responseNodeOptimization": 1,
     "excitationNodePlot": 1,
@@ -30,7 +30,8 @@
     "plotType": 1,
     "neutralizers": [
       {
-        "mass": 10.0,
+        "mass": 0.20,
+        "massTypeUserDefined": false,
         "optimizationVariables": {
           "real": [
             {
@@ -64,12 +65,13 @@
         }
       },
       {
-        "mass": 10.0,
+        "mass": 0.1,
+        "massTypeUserDefined": false,
         "optimizationVariables": {
           "real": [
             {
               "name": "frequency",
-              "lowerBound": 20,
+              "lowerBound": 30,
               "upperBound": 30,
               "discretization": 200
             }

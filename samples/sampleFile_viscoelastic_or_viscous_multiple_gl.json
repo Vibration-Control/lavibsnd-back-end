@@ -58579,6 +58579,7 @@
   "neutralizers": [
     {
       "mass": 2.0,
+      "massTypeUserDefined": true,
       "optimizationVariables": {
         "real": [
           {
@@ -58621,6 +58622,7 @@
     },
     {
       "mass": 2.0,
+      "massTypeUserDefined": true,
       "optimizationVariables": {
         "real": [
           {

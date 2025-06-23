@@ -16,7 +16,9 @@ def prepare_objective_function_input(optimization_data, plot = False):
     neutralizers: List[NeutralizerParameters] = []
     for neutralizer in optimization_data.neutralizers:
         neutralizer_parameters = NeutralizerParameters(
-            mass = neutralizer.mass
+            mass = neutralizer.mass,
+            original_mass = neutralizer.mass,
+            mass_type_user_defined = neutralizer.mass_type_user_defined
         )
         neutralizers.append(neutralizer_parameters)
 
@@ -47,7 +49,9 @@ def prepare_objective_function_input(optimization_data, plot = False):
         primary_system_modal_damping = optimization_data.primary_system_modal_damping,
         primary_system_modes = optimization_data.primary_system_modes,
         excitation_node_optimization = excitation_node,
-        response_node_optimization = response_node
+        response_node_optimization = response_node,
+        objective_function_search_lower_bound=optimization_data.objective_function_search_lower_bound,
+        objective_function_search_upper_bound=optimization_data.objective_function_search_upper_bound
     )
 
     return objective_function_input
@@ -71,22 +75,52 @@ def alfa(TT0, TT1, teta1, teta2):
     alfa = 10.0 ** (-teta1 * deltaT / (teta2 + deltaT))
     return alfa
 
-def insert_neutralizers(objective_function_input,ga_variables_values,ga_variables_names, ga_variables_per_neutralizer):
+def compute_neutralizer_mass(neutralizer, optimization_data):
+    if neutralizer.mass_type_user_defined:
+        return neutralizer.original_mass
+
+    valid_modes = [
+        i for i, freq in enumerate(optimization_data.primary_system_natural_frequencies)
+        if optimization_data.objective_function_search_lower_bound <= freq <= optimization_data.objective_function_search_upper_bound
+    ]
+
+    total_mass = 0.0
+    for i in valid_modes:
+        shape = optimization_data.primary_system_modes[i]
+        amplitude = abs(shape[neutralizer.modal_position])
+        total_mass += neutralizer.original_mass / amplitude**2
+
+    print(f"total_mass: {total_mass}")
+    return total_mass / len(valid_modes) if valid_modes else 0.0
+
+def insert_neutralizers(objective_function_input, ga_variables_values, ga_variables_names, ga_variables_per_neutralizer):
+    var_offset = 0
+
     for neutralizer_index, neutralizer in enumerate(objective_function_input.neutralizers):
-        for variable_index in range(ga_variables_per_neutralizer[neutralizer_index]):
-            if ga_variables_names[variable_index] == "frequency":
-                setattr(neutralizer, ga_variables_names[variable_index], ga_variables_values[variable_index]*2*np.pi)
+        num_vars = ga_variables_per_neutralizer[neutralizer_index]
+
+        for i in range(num_vars):
+            var_name = ga_variables_names[var_offset + i]
+            var_value = ga_variables_values[var_offset + i]
+
+            if var_name == "frequency":
+                setattr(neutralizer, var_name, var_value * 2 * np.pi)
             else:
-                setattr(neutralizer, ga_variables_names[variable_index], ga_variables_values[variable_index])
+                setattr(neutralizer, var_name, var_value)
+
+        var_offset += num_vars
+
+        neutralizer.mass = compute_neutralizer_mass(neutralizer, objective_function_input)
 
     return objective_function_input
+
 
 def optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer):
     plot_input = prepare_objective_function_input(optimization_input, plot = True)
     plot_input_with_neutralizers = insert_neutralizers(plot_input, solution, gene_name, gene_per_neutralizer)
     composed_system_receptance = objective_function(plot_input_with_neutralizers, True)
     primary_system_receptance = primary_system_response(plot_input_with_neutralizers)
-    return composed_system_receptance,primary_system_receptance
+    return composed_system_receptance,primary_system_receptance, plot_input_with_neutralizers.neutralizers
 
 def ga_preparation(optimization_input):
     objective_function_input = prepare_objective_function_input(optimization_input)

@@ -41,7 +41,13 @@ def deserialize_optimization_file(json_data) -> InputData:
 
     def parse_neutralizer(item):
         optimization_variables = parse_optimization_variables(item['optimizationVariables'])
-        return Neutralizer(type=item.get('type', 0), mass=item['mass'], optimization_variables=optimization_variables)
+        return Neutralizer(
+            type=item.get('type', 0),
+            mass=item['mass'],
+            mass_type_user_defined=item.get('massTypeUserDefined', True),
+            optimization_variables=optimization_variables
+        )
+
 
     def parse_genetic_algorithm(data):
         return GeneticAlgorithm(

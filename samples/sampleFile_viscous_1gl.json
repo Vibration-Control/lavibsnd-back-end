@@ -28,6 +28,7 @@
   "neutralizers": [
     {
       "mass": 100.0,
+      "massTypeUserDefined": true,
       "optimizationVariables": {
         "real": [
           {
