@@ -18,9 +18,27 @@ def objective_function(optimization_data, plot = False):
             for k in range(number_of_modes):
                 for l in range(number_of_neutralizers):
                     frenquency_ratio = optimization_data.frequencies[i]/optimization_data.neutralizers[l].frequency
-                    equivalent_mass, equivalent_damp = equivalent_parameters(optimization_data.neutralizers[l],frenquency_ratio, calculate_real_shear_module_ratio(complex_shear_module_per_neutralizer,l,i,frequency_index_per_neutralizer), calculate_loss_factor_per_neutralizer(loss_factor_per_neutralizer, l, i), calculate_dynamic_stiffness(optimization_data.user_defined_dynamic_stiffnesses,optimization_data.neutralizers[l].dynamic_stiffness, i ))
-                    modal_mass_array[j][k] += equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
-                    modal_damp_array[j][k] += equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
+                    equivalent_mass, equivalent_damp = equivalent_parameters(
+                        optimization_data.neutralizers[l],
+                        frenquency_ratio,
+                        calculate_real_shear_module_ratio(complex_shear_module_per_neutralizer, l, i, frequency_index_per_neutralizer),
+                        calculate_loss_factor_per_neutralizer(loss_factor_per_neutralizer, l, i),
+                        calculate_dynamic_stiffness(optimization_data.user_defined_dynamic_stiffnesses, optimization_data.neutralizers[l].dynamic_stiffness, i),
+                        calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neutralizer, l, i, frequency_index_per_neutralizer)
+                    )
+
+                    if optimization_data.neutralizers[l].type in [0, 1, 2]:
+                        modal_mass_array[j][k] += equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
+                        modal_damp_array[j][k] += equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
+            
+                    if optimization_data.neutralizers[l].type == 3:
+                        modal_mass_array[j][k] += equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
+                        modal_mass_array[j][k] -= equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
+                        modal_mass_array[j][k] -= equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
+
+                        modal_damp_array[j][k] += equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
+                        modal_damp_array[j][k] -= equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
+                        modal_damp_array[j][k] -= equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]     
         for j in range(number_of_modes):
             primary_system_stiffness = complex(optimization_data.primary_system_natural_frequencies[j]**2 - optimization_data.frequencies[i]**2, optimization_data.primary_system_natural_frequencies[j]**2 * optimization_data.primary_system_modal_damping[j])
             for k in range(number_of_modes):
@@ -40,7 +58,7 @@ def objective_function(optimization_data, plot = False):
 
     return receptance
 
-def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio = 0, loss_factor = 0, dynamic_stifness = 0.0):
+def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio = 0, loss_factor = 0, dynamic_stifness = 0.0, real_shear_module_at_system_frequency = 0.0):
     equivalent_mass = 0
     equivalent_damp = 0
     if(neutralizer.type == 0):
@@ -55,6 +73,16 @@ def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio 
         denominator = (frequency_ratio ** 2. - 1.) ** 2. + (2. * neutralizer.damp * frequency_ratio) ** 2.
         equivalent_damp = neutralizer.mass * neutralizer.frequency * 2. * neutralizer.damp * frequency_ratio ** 4. / denominator
         equivalent_mass = -neutralizer.mass * (frequency_ratio ** 2. - (1. + (2. * neutralizer.damp * frequency_ratio) ** 2.)) / denominator
+    if(neutralizer.type == 3):
+        denominator = frequency_ratio * neutralizer.frequency
+        equivalent_mass = -neutralizer.shape_factor * real_shear_module_at_system_frequency / denominator**2
+        equivalent_damp = neutralizer.shape_factor * real_shear_module_at_system_frequency * loss_factor / denominator
+        print(f"denominator: {denominator}")
+        print(f"neutralizer.shape_factor: {neutralizer.shape_factor}")
+        print(f"real_shear_module_at_system_frequency: {real_shear_module_at_system_frequency}")
+        print(f"loss_factor: {loss_factor}")
+        print(f"equivalent_mass: {equivalent_mass}")
+        print(f"equivalent_damp: {equivalent_damp}")
 
     return equivalent_mass, equivalent_damp
 
@@ -88,3 +116,9 @@ def calculate_dynamic_stiffness(user_defined_dynamic_stiffnesses,dynamic_stiffne
     if len(user_defined_dynamic_stiffnesses) > 0:
         dynamic_stiffness = user_defined_dynamic_stiffnesses[dynamic_stiffness_index][frequency_index]
     return dynamic_stiffness
+
+def calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neutralizer,neutralizers_index,frequency_index,frequency_index_per_neutralizer):
+    real_shear_module_at_system_frequency = 0
+    if len(complex_shear_module_per_neutralizer) > 0:
+        real_shear_module_at_system_frequency = complex_shear_module_per_neutralizer[neutralizers_index][frequency_index].real
+    return real_shear_module_at_system_frequency

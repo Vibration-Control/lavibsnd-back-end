@@ -93,15 +93,17 @@ class InputData:
 class NeutralizerParameters:
     def __init__(
         self,
-        mass: float,
-        original_mass: float,
+        mass: float = 0.1,
+        original_mass: float = 0.1,
         mass_type_user_defined: bool = True,
         type: int = 0,
-        frequency: float = 0.0,
+        frequency: float = 1.0,
         damp: float = 0.0,
         viscoelastic_material: int = 0,
         dynamic_stiffness: int = 0,
-        modal_position: int = 1
+        modal_position: int = 1,
+        modal_position_tip: int = 1,
+        shape_factor: float = 1.0
     ):
         self.type = type
         self.frequency = frequency
@@ -112,6 +114,8 @@ class NeutralizerParameters:
         self.viscoelastic_material = viscoelastic_material
         self.dynamic_stiffness = dynamic_stiffness
         self.modal_position = modal_position
+        self.modal_position_tip = modal_position_tip
+        self.shape_factor = shape_factor
 
 
 class ObjectiveFunctionInput:

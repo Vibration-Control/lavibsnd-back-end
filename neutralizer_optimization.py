@@ -43,6 +43,8 @@ def neutralizer_optimization(data):
             keys = ["frequency", "type", "modal_position", "viscoelastic_material"]
         elif neutralizer_type in (0, 2):
             keys = ["frequency", "damp", "type", "modal_position"]
+        elif neutralizer_type == 3:
+            keys = ["shape_factor", "modal_position", "modal_position_tip", "type"]
         else:
             raise ValueError(f"Unknown neutralizer type {neutralizer_type}")
 
