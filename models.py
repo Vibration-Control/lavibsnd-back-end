@@ -57,8 +57,9 @@ class GeneticAlgorithm:
 
 
 class AdditionalParameters:
-    def __init__(self, user_defined_dynamic_stiffnesses: List[DynamicStiffnessVariable], viscoelastic_materials: List[ViscoelasticMaterial]):
+    def __init__(self, user_defined_dynamic_stiffnesses: List[DynamicStiffnessVariable],temperature_detuning: List[float], viscoelastic_materials: List[ViscoelasticMaterial]):
         self.user_defined_dynamic_stiffnesses = user_defined_dynamic_stiffnesses
+        self.temperature_detuning = temperature_detuning
         self.viscoelastic_materials = viscoelastic_materials
 
 
