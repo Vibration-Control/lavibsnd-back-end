@@ -31,7 +31,7 @@
     "neutralizers": [
       {
         "mass": 0.1,
-        "massTypeUserDefined": true,
+        "massTypeUserDefined": false,
         "optimizationVariables": {
           "real": [
             {
@@ -65,7 +65,7 @@
       },
       {
         "mass": 0.1,
-        "massTypeUserDefined": true,
+        "massTypeUserDefined": false,
         "optimizationVariables": {
           "real": [
             {
@@ -112,6 +112,7 @@
           "teta2": 81.7
         }
       ],
+      "temperatureDetuning": [273,323],
       "userDefinedDynamicStiffnesses": []
     },
     "objectiveFunctionSearchLowerBound": 10,
