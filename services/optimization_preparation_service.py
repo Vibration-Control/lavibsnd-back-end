@@ -115,10 +115,10 @@ def insert_neutralizers(objective_function_input, ga_variables_values, ga_variab
     return objective_function_input
 
 def calculate_receptances_with_temperature_detuning(optimization_input, plot_input_with_neutralizers):
-    receptances = []
-
+    receptances_with_detuning = []
+    
     # Iterate through all detuning temperatures
-    for temp in optimization_input.additional_parameters.temperature_detuning:
+    for temperature in optimization_input.additional_parameters.temperature_detuning:
         # Work on a fresh copy of the input
         modified_input = ObjectiveFunctionInput(
             **vars(plot_input_with_neutralizers)
@@ -130,25 +130,30 @@ def calculate_receptances_with_temperature_detuning(optimization_input, plot_inp
         for neu in modified_input.neutralizers:
             if neu.viscoelastic_material is not None:
                 # Temporarily adjust working temperature
-                viscoelastic = neu.viscoelastic_material
-                original_temp = viscoelastic.workingTemperature
-                viscoelastic.workingTemperature = temp
+                viscoelastic = optimization_input.additional_parameters.viscoelastic_materials[neu.viscoelastic_material]
+                original_temperature = viscoelastic.workingTemperature
+                viscoelastic.workingTemperature = temperature
 
                 # Recompute modulus
-                shear_mod = complex_shear_modulus(viscoelastic, modified_input.frequencies)
-                complex_shear_mods.append(shear_mod)
+                complex_shear_mod = complex_shear_modulus(viscoelastic, modified_input.frequencies)
+                complex_shear_mods.append(complex_shear_mod)
 
                 # Restore working temperature so we don't mess with other runs
-                viscoelastic.workingTemperature = original_temp
+                viscoelastic.workingTemperature = original_temperature
 
         # Replace the complex_shear_moduluses for this run
         modified_input.complex_shear_moduluses = complex_shear_mods
 
         # Compute receptance
         receptance = objective_function(modified_input, True)
-        receptances.append(receptance)
 
-    return receptances
+        # Store result as { "temperature": <val>, "receptance": [...] }
+        receptances_with_detuning.append({
+            "temperature": temperature,
+            "receptance": receptance
+        })
+
+    return receptances_with_detuning
 
 
 def optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer):
@@ -160,11 +165,12 @@ def optimal_solution(optimization_input, solution, gene_name, gene_per_neutraliz
     composed_system_receptance = objective_function(plot_input_with_neutralizers, True)
     primary_system_receptance = primary_system_response(plot_input_with_neutralizers)
 
-    # Calculate receptances under temperature detuning
-    receptances_with_detuning = calculate_receptances_with_temperature_detuning(
-        optimization_input, plot_input_with_neutralizers
-    )
-    return composed_system_receptance,primary_system_receptance,receptances_with_detuning, plot_input_with_neutralizers.neutralizers
+    # Calculate receptances under temperature detuning (only if non-empty)
+    receptances_with_detuning = []
+    if (optimization_input.additional_parameters.temperature_detuning is not None and len(optimization_input.additional_parameters.temperature_detuning) > 0):
+        receptances_with_detuning = calculate_receptances_with_temperature_detuning(optimization_input, plot_input_with_neutralizers)
+    
+    return composed_system_receptance, primary_system_receptance, receptances_with_detuning, plot_input_with_neutralizers.neutralizers
 
 def ga_preparation(optimization_input):
     objective_function_input = prepare_objective_function_input(optimization_input)
