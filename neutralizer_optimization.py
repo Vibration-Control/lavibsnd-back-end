@@ -14,7 +14,7 @@ def neutralizer_optimization(data):
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
     print(f"Best solution: {solution}, Fitness: {solution_fitness}")
     
-    optimal_receptance, primary_system_receptance, optimezed_neutralizer = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
+    optimal_receptance, primary_system_receptance, receptances_with_detuning, optimezed_neutralizer = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
     primary_system_frf = 20 * np.log10(abs(primary_system_receptance))
     composed_system_frf = 20 * np.log10(abs(optimal_receptance))
 
@@ -69,7 +69,12 @@ def neutralizer_optimization(data):
         structured_solution.append(neutralizer_dict)
         i += genes_in_neutralizer
 
-
+    for item in receptances_with_detuning:
+        r = item["receptance"]
+        # Convert complex array to magnitude in dB
+        magnitude_db = 20 * np.log10(np.abs(r))
+        # Store as a plain Python list
+        item["receptance"] = magnitude_db.tolist()
 
     # Prepare the result dictionary
     result = {
@@ -77,7 +82,8 @@ def neutralizer_optimization(data):
         "solutionFitness": solution_fitness,
         "frequency": frequencies.tolist(),
         "primary_system_frf": primary_system_frf.tolist(),
-        "composed_system_frf": composed_system_frf.tolist()
+        "composed_system_frf": composed_system_frf.tolist(),
+        "receptances_with_detuning": receptances_with_detuning
     }
 
     return result

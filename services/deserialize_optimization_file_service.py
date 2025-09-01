@@ -60,7 +60,8 @@ def deserialize_optimization_file(json_data) -> InputData:
     def parse_additional_parameters(data):
         user_defined_dynamic_stiffnesses = [parse_dynamic_stiffness_variable(item) for item in data['userDefinedDynamicStiffnesses']]
         viscoelastic_materials = [parse_viscoelastic_material(item) for item in data['viscoelasticMaterials']]
-        return AdditionalParameters(user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses, viscoelastic_materials=viscoelastic_materials)
+        temperature_detuning = data['temperatureDetuning']
+        return AdditionalParameters(user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses, temperature_detuning=temperature_detuning, viscoelastic_materials=viscoelastic_materials)
 
     # Parse neutralizers
     neutralizers = [parse_neutralizer(item) for item in data['neutralizers']]

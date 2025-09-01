@@ -90,7 +90,9 @@
           "teta2": 81.7
         }
       ],
+      "temperatureDetuning": [273,283,303,313],
       "userDefinedDynamicStiffnesses": []
+      
     },
     "objectiveFunctionSearchLowerBound": 10,
     "objectiveFunctionSearchUpperBound": 30,
