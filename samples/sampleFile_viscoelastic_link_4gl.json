@@ -80,12 +80,12 @@
       "viscoelasticMaterials": [
         {
           "name": "Elastomero BT 806/55",
-          "TT1": 293,
-          "TT0": 243,
-          "GH": 15233333,
-          "GL": 240333,
-          "beta": 0.417,
-          "FI": 0.0223,
+          "workingTemperature": 293,
+          "referenceTemperature": 243,
+          "upperShearModulus": 15233333,
+          "lowerShearModulus": 240333,
+          "fractionalDerivativeParameter": 0.417,
+          "temperatureShiftingFactor": 0.0223,
           "teta1": 7.98,
           "teta2": 81.7
         }

@@ -58,20 +58,20 @@ def prepare_objective_function_input(optimization_data, plot = False):
 
 def complex_shear_modulus(viscoelastic_material, frequencies):
 
-    GL = viscoelastic_material.GL
-    GH = viscoelastic_material.GH
-    FI = viscoelastic_material.FI
-    alfaT = alfa(viscoelastic_material.TT0, viscoelastic_material.TT1, viscoelastic_material.teta1, viscoelastic_material.teta2)
+    lowerShearModulus = viscoelastic_material.lowerShearModulus
+    upperShearModulus = viscoelastic_material.upperShearModulus
+    temperatureShiftingFactor = viscoelastic_material.temperatureShiftingFactor
+    alfaT = alfa(viscoelastic_material.referenceTemperature, viscoelastic_material.workingTemperature, viscoelastic_material.teta1, viscoelastic_material.teta2)
     
-    numerator = GL + (GH * FI) * (1j * alfaT * frequencies) ** viscoelastic_material.beta
-    denominator = 1.0 + FI * (1j * alfaT * frequencies) ** viscoelastic_material.beta
+    numerator = lowerShearModulus + (upperShearModulus * temperatureShiftingFactor) * (1j * alfaT * frequencies) ** viscoelastic_material.fractionalDerivativeParameter
+    denominator = 1.0 + temperatureShiftingFactor * (1j * alfaT * frequencies) ** viscoelastic_material.fractionalDerivativeParameter
     
     complex_shear_modulus = numerator / denominator
 
     return complex_shear_modulus
 
-def alfa(TT0, TT1, teta1, teta2):
-    deltaT = TT1 - TT0
+def alfa(referenceTemperature, workingTemperature, teta1, teta2):
+    deltaT = workingTemperature - referenceTemperature
     alfa = 10.0 ** (-teta1 * deltaT / (teta2 + deltaT))
     return alfa
 

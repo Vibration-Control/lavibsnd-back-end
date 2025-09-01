@@ -120,23 +120,23 @@
       "viscoelasticMaterials": [
         {
           "name": "Elastomero BT 806/55",
-          "TT1": 293,
-          "TT0": 243,
-          "GH": 15233333,
-          "GL": 240333,
-          "beta": 0.417,
-          "FI": 0.0223,
+          "workingTemperature": 293,
+          "referenceTemperature": 243,
+          "upperShearModulus": 15233333,
+          "lowerShearModulus": 240333,
+          "fractionalDerivativeParameter": 0.417,
+          "temperatureShiftingFactor": 0.0223,
           "teta1": 7.98,
           "teta2": 81.7
         },
         {
           "name": "fake rubber",
-          "TT1": 273,
-          "TT0": 243,
-          "GH": 10000000000,
-          "GL": 100000000,
-          "beta": 0.417,
-          "FI": 0.02,
+          "workingTemperature": 273,
+          "referenceTemperature": 243,
+          "upperShearModulus": 10000000000,
+          "lowerShearModulus": 100000000,
+          "fractionalDerivativeParameter": 0.417,
+          "temperatureShiftingFactor": 0.02,
           "teta1": 8,
           "teta2": 80
         }

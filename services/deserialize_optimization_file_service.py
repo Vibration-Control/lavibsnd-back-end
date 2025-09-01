@@ -24,12 +24,12 @@ def deserialize_optimization_file(json_data) -> InputData:
     def parse_viscoelastic_material(item):
         return ViscoelasticMaterial(
             name=item['name'],
-            TT1=item.get('TT1', 0),
-            TT0=item.get('TT0', 0),
-            GH=item.get('GH', 0),
-            GL=item.get('GL', 0),
-            beta=item.get('beta', 0.0),
-            FI=item.get('FI', 0.0),
+            workingTemperature=item.get('workingTemperature', 0),
+            referenceTemperature=item.get('referenceTemperature', 0),
+            upperShearModulus=item.get('upperShearModulus', 0),
+            lowerShearModulus=item.get('lowerShearModulus', 0),
+            fractionalDerivativeParameter=item.get('fractionalDerivativeParameter', 0.0),
+            temperatureShiftingFactor=item.get('temperatureShiftingFactor', 0.0),
             teta1=item.get('teta1', 0.0),
             teta2=item.get('teta2', 0.0)
         )

@@ -77,12 +77,6 @@ def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio 
         denominator = frequency_ratio * neutralizer.frequency
         equivalent_mass = -neutralizer.shape_factor * real_shear_module_at_system_frequency / denominator**2
         equivalent_damp = neutralizer.shape_factor * real_shear_module_at_system_frequency * loss_factor / denominator
-        print(f"denominator: {denominator}")
-        print(f"neutralizer.shape_factor: {neutralizer.shape_factor}")
-        print(f"real_shear_module_at_system_frequency: {real_shear_module_at_system_frequency}")
-        print(f"loss_factor: {loss_factor}")
-        print(f"equivalent_mass: {equivalent_mass}")
-        print(f"equivalent_damp: {equivalent_damp}")
 
     return equivalent_mass, equivalent_damp
 

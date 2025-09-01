@@ -22,14 +22,14 @@ class DynamicStiffnessVariable:
 
 
 class ViscoelasticMaterial:
-    def __init__(self, name: str, TT1: int, TT0: int, GH: int, GL: int, beta: float, FI: float, teta1: float, teta2: float):
+    def __init__(self, name: str, workingTemperature: int, referenceTemperature: int, upperShearModulus: int, lowerShearModulus: int, fractionalDerivativeParameter: float, temperatureShiftingFactor: float, teta1: float, teta2: float):
         self.name = name
-        self.TT1 = TT1
-        self.TT0 = TT0
-        self.GH = GH
-        self.GL = GL
-        self.beta = beta
-        self.FI = FI
+        self.workingTemperature = workingTemperature
+        self.referenceTemperature = referenceTemperature
+        self.upperShearModulus = upperShearModulus
+        self.lowerShearModulus = lowerShearModulus
+        self.fractionalDerivativeParameter = fractionalDerivativeParameter
+        self.temperatureShiftingFactor = temperatureShiftingFactor
         self.teta1 = teta1
         self.teta2 = teta2
 
