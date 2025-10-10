@@ -66,6 +66,7 @@
   ],
   "additionalParameters": {
     "viscoelasticMaterials": [],
+    "temperatureDetuning": [],
     "userDefinedDynamicStiffnesses": [
       {
         "name": "neutralizer1",
