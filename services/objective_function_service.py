@@ -27,11 +27,11 @@ def objective_function(optimization_data, plot = False):
                         calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neutralizer, l, i, frequency_index_per_neutralizer)
                     )
 
-                    if optimization_data.neutralizers[l].type in [0, 1, 2]:
+                    if optimization_data.neutralizers[l].type in [0, 1, 2, 3]:
                         modal_mass_array[j][k] += equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
                         modal_damp_array[j][k] += equivalent_damp * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
             
-                    if optimization_data.neutralizers[l].type == 3:
+                    if optimization_data.neutralizers[l].type == 4:
                         modal_mass_array[j][k] += equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
                         modal_mass_array[j][k] -= equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position_tip]
                         modal_mass_array[j][k] -= equivalent_mass * optimization_data.primary_system_modes[j][optimization_data.neutralizers[l].modal_position_tip] * optimization_data.primary_system_modes[k][optimization_data.neutralizers[l].modal_position]
@@ -73,7 +73,7 @@ def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio 
         denominator = (frequency_ratio ** 2. - 1.) ** 2. + (2. * neutralizer.damp * frequency_ratio) ** 2.
         equivalent_damp = neutralizer.mass * neutralizer.frequency * 2. * neutralizer.damp * frequency_ratio ** 4. / denominator
         equivalent_mass = -neutralizer.mass * (frequency_ratio ** 2. - (1. + (2. * neutralizer.damp * frequency_ratio) ** 2.)) / denominator
-    if(neutralizer.type == 3):
+    if(neutralizer.type in (3, 4)):
         denominator = frequency_ratio * neutralizer.frequency
         equivalent_mass = -neutralizer.shape_factor * real_shear_module_at_system_frequency / denominator**2
         equivalent_damp = neutralizer.shape_factor * real_shear_module_at_system_frequency * loss_factor / denominator

@@ -51,19 +51,13 @@
             {
               "name": "type",
               "range": [
-                4
+                3
               ]
             },
             {
               "name": "modal_position",
               "range": [
                 1
-              ]
-            },
-            {
-              "name": "modal_position_tip",
-              "range": [
-                2
               ]
             },
             {
