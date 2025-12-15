@@ -52,9 +52,20 @@ def convert_rst_to_json(rst_file):
         idx = node_index.get(node, None)
         if idx is not None:
             pos = coords[idx]
-            node_positions.append([float(pos[0]), float(pos[1]), float(pos[2])])
+            node_positions.append([
+                int(node),
+                float(pos[0]),
+                float(pos[1]),
+                float(pos[2]),
+            ])
         else:
-            node_positions.append([0.0, 0.0, 0.0])
+            node_positions.append([
+                int(node),
+                0.0,
+                0.0,
+                0.0,
+            ])
+
 
     return {
         "PrimarySystemNaturalFrequencies": natural_freqs,

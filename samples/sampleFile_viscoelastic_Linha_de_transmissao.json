@@ -78696,7 +78696,8 @@
       273,
       323
     ],
-    "userDefinedDynamicStiffnesses": []
+    "userDefinedDynamicStiffnesses": [],
+      "PrimarySystemNodePositions": []
   },
   "objectiveFunctionSearchLowerBound": 10,
   "objectiveFunctionSearchUpperBound": 30,

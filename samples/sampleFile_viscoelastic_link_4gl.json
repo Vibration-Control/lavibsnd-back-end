@@ -91,8 +91,8 @@
         }
       ],
       "temperatureDetuning": [273,283,303,313],
-      "userDefinedDynamicStiffnesses": []
-      
+      "userDefinedDynamicStiffnesses": [],
+      "PrimarySystemNodePositions": []
     },
     "objectiveFunctionSearchLowerBound": 10,
     "objectiveFunctionSearchUpperBound": 30,

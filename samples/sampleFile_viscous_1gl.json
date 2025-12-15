@@ -64,7 +64,8 @@
   "additionalParameters": {
     "viscoelasticMaterials": [],
     "temperatureDetuning": [],
-    "userDefinedDynamicStiffnesses": []
+    "userDefinedDynamicStiffnesses": [],
+    "PrimarySystemNodePositions": []
   },
   "objectiveFunctionSearchLowerBound": 10,
   "objectiveFunctionSearchUpperBound": 30,

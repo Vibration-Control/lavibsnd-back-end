@@ -478,7 +478,8 @@
           80083.76626024
         ]
       }
-    ]
+    ],
+      "PrimarySystemNodePositions": []
   },
   "objectiveFunctionSearchLowerBound": 10,
   "objectiveFunctionSearchUpperBound": 30,
