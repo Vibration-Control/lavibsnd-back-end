@@ -51,11 +51,11 @@ def objective_function(optimization_data, plot = False):
             for k in range(number_of_modes):
                 receptance[i] += inverse_composed_system_matrix [j][k] * optimization_data.primary_system_modes[j][optimization_data.response_node_optimization] * optimization_data.primary_system_modes[k][optimization_data.excitation_node_optimization]
 
-    # Plotting the data
+    """# Plotting the data
     if(plot):
         plt.plot(optimization_data.frequencies/(2*np.pi),20*np.log10(abs(receptance)))
         plt.show()
-
+    """
     return receptance
 
 def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio = 0, loss_factor = 0, dynamic_stifness = 0.0, real_shear_module_at_system_frequency = 0.0):

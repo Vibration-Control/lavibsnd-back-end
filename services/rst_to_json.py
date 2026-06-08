@@ -25,6 +25,8 @@ def convert_rst_to_json(rst_file):
         disp_vectors = disp_tuple[1]
         mag = np.linalg.norm(disp_vectors, axis=1)
 
+        eps = 1e-5
+        mag = np.clip(mag, eps, None)
         mode_node_ids.append(node_ids)
         mode_magnitudes.append(mag)
 
