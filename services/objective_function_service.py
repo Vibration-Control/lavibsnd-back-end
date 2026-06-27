@@ -10,6 +10,7 @@ def objective_function(optimization_data, plot=False):
     phi = np.asarray(optimization_data.primary_system_modes)
     composed_system_stiffness = np.zeros((number_of_modes, number_of_modes), dtype=complex)
     receptance = np.zeros(frequency_discretization, dtype=complex)
+    objective_by_frequency = np.zeros(frequency_discretization, dtype=complex)
 
     (complex_shear_module_per_neutralizer, frequency_index_per_neutralizer, loss_factor_per_neutralizer) = calculate_viscoelastic_properties(optimization_data, number_of_neutralizers)
 
@@ -52,10 +53,17 @@ def objective_function(optimization_data, plot=False):
                     composed_system_stiffness[j, k] += primary_system_stiffness
 
         inverse_composed_system_matrix = np.linalg.inv(composed_system_stiffness)
-        H = phi.T @ inverse_composed_system_matrix @ phi
-        receptance[i] = H[optimization_data.response_node_optimization, optimization_data.excitation_node_optimization]
 
-    return receptance
+        receptance[i], objective_by_frequency[i] = calculate_objective(
+            objective_type=3,
+            Dinv=inverse_composed_system_matrix,
+            phi=phi,
+            optimization_data=optimization_data,
+            plot=plot,
+        )
+
+    objective = -np.sum(objective_by_frequency).real
+    return receptance, objective
 
 
 def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio=0, loss_factor=0, dynamic_stifness=0.0, real_shear_module_at_system_frequency=0.0):
@@ -121,3 +129,52 @@ def calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neu
     if len(complex_shear_module_per_neutralizer) > 0:
         real_shear_module_at_system_frequency = complex_shear_module_per_neutralizer[neutralizers_index][frequency_index].real
     return real_shear_module_at_system_frequency
+
+def calculate_objective(objective_type: int, Dinv: np.ndarray, phi: np.ndarray, optimization_data, plot: bool = False):
+    excitation = optimization_data.excitation_node_optimization
+    response = optimization_data.response_node_optimization
+    receptance = None
+    phi_s = tmp = None
+
+    if objective_type in (0, 3, 5):
+        phi_s = phi[:, excitation]
+        tmp = Dinv @ phi_s
+
+    H = None
+    if plot or objective_type == 4:
+        H = phi.T @ Dinv @ phi
+
+    if plot:
+        receptance = H[response, excitation]
+
+    # Modal coordinates (point excitation)
+    if objective_type == 0:
+        objective = np.linalg.norm(tmp, 2)
+
+    # Modal coordinates (distributed excitation)
+    elif objective_type == 1:
+        
+        modal_force = phi @ optimization_data.distributed_force
+        objective = np.linalg.norm(Dinv @ modal_force, 2)
+        
+    # Modal dynamic amplification norm
+    elif objective_type == 2:
+        objective = np.linalg.norm(Dinv, "fro")
+
+    # Single FRF H(K,S)
+    elif objective_type == 3:
+        phi_r = phi[:, response]
+        objective = np.abs(phi_r @ tmp) ** 2
+
+    # Global FRF Frobenius norm
+    elif objective_type == 4:
+        objective = np.linalg.norm(H, "fro")
+
+    # FRF column norm
+    elif objective_type == 5:
+        objective = np.linalg.norm(phi.T @ tmp, 2)
+
+    else:
+        raise ValueError(f"Unknown objective function type: {objective_type}")
+
+    return receptance, objective

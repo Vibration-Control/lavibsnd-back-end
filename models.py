@@ -57,21 +57,33 @@ class GeneticAlgorithm:
 
 
 class AdditionalParameters:
-    def __init__(self, user_defined_dynamic_stiffnesses: List[DynamicStiffnessVariable],temperature_detuning: List[float], viscoelastic_materials: List[ViscoelasticMaterial]):
+    def __init__(self, user_defined_dynamic_stiffnesses: List[DynamicStiffnessVariable], temperature_detuning: List[float], viscoelastic_materials: List[ViscoelasticMaterial]):
         self.user_defined_dynamic_stiffnesses = user_defined_dynamic_stiffnesses
         self.temperature_detuning = temperature_detuning
         self.viscoelastic_materials = viscoelastic_materials
 
 
 class InputData:
-    def __init__(self, primary_system_natural_frequencies: int, primary_system_modal_damping: int, primary_system_modes: List[List[float]], 
-                 excitation_node_optimization: int, response_node_optimization: int, 
-                 excitation_node_plot: int, response_node_plot: int, plot_type: int, 
-                 neutralizers: List[Neutralizer],
-                 additional_parameters: AdditionalParameters,
-                 objective_function_search_lower_bound: int, objective_function_search_upper_bound: int, objective_function_search_discretization: int,
-                 plot_lower_bound: int, plot_upper_bound: int, plot_discretization: int, 
-                 genetic_algorithm: GeneticAlgorithm):
+    def __init__(
+        self,
+        primary_system_natural_frequencies: int,
+        primary_system_modal_damping: int,
+        primary_system_modes: List[List[float]],
+        excitation_node_optimization: int,
+        response_node_optimization: int,
+        excitation_node_plot: int,
+        response_node_plot: int,
+        plot_type: int,
+        neutralizers: List[Neutralizer],
+        additional_parameters: AdditionalParameters,
+        objective_function_search_lower_bound: int,
+        objective_function_search_upper_bound: int,
+        objective_function_search_discretization: int,
+        plot_lower_bound: int,
+        plot_upper_bound: int,
+        plot_discretization: int,
+        genetic_algorithm: GeneticAlgorithm,
+    ):
         self.primary_system_natural_frequencies = primary_system_natural_frequencies
         self.primary_system_modal_damping = primary_system_modal_damping
         self.primary_system_modes = primary_system_modes
@@ -92,20 +104,7 @@ class InputData:
 
 
 class NeutralizerParameters:
-    def __init__(
-        self,
-        mass: float = 0.1,
-        original_mass: float = 0.1,
-        mass_type_user_defined: bool = True,
-        type: int = 0,
-        frequency: float = 1.0,
-        damp: float = 0.0,
-        viscoelastic_material: int = 0,
-        dynamic_stiffness: int = 0,
-        modal_position: int = 1,
-        modal_position_tip: int = 1,
-        shape_factor: float = 1.0
-    ):
+    def __init__(self, mass: float = 0.1, original_mass: float = 0.1, mass_type_user_defined: bool = True, type: int = 0, frequency: float = 1.0, damp: float = 0.0, viscoelastic_material: int = 0, dynamic_stiffness: int = 0, modal_position: int = 1, modal_position_tip: int = 1, shape_factor: float = 1.0):
         self.type = type
         self.frequency = frequency
         self.damp = damp
@@ -120,20 +119,7 @@ class NeutralizerParameters:
 
 
 class ObjectiveFunctionInput:
-    def __init__(
-        self,
-        frequencies: list[float],
-        user_defined_dynamic_stiffnesses: list[float],
-        complex_shear_moduluses: list[float],
-        neutralizers: list[NeutralizerParameters],
-        primary_system_natural_frequencies: list[float],
-        primary_system_modal_damping: list[float],
-        primary_system_modes: list[list[float]],
-        excitation_node_optimization: int,
-        response_node_optimization: int,
-        objective_function_search_lower_bound: float,
-        objective_function_search_upper_bound: float,
-    ):
+    def __init__(self, frequencies: list[float], user_defined_dynamic_stiffnesses: list[float], complex_shear_moduluses: list[float], neutralizers: list[NeutralizerParameters], primary_system_natural_frequencies: list[float], primary_system_modal_damping: list[float], primary_system_modes: list[list[float]], excitation_node_optimization: int, response_node_optimization: int, objective_function_search_lower_bound: float, objective_function_search_upper_bound: float):
         self.frequencies = frequencies
         self.complex_shear_moduluses = complex_shear_moduluses
         self.user_defined_dynamic_stiffnesses = user_defined_dynamic_stiffnesses

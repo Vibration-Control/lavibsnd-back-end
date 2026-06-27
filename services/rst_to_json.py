@@ -2,6 +2,7 @@ import numpy as np
 import tempfile
 from ansys.mapdl.reader import read_binary
 
+
 def convert_rst_to_json(rst_file):
     with tempfile.NamedTemporaryFile(delete=False, suffix=".rst") as temp_rst:
         rst_file.save(temp_rst.name)
@@ -54,23 +55,8 @@ def convert_rst_to_json(rst_file):
         idx = node_index.get(node, None)
         if idx is not None:
             pos = coords[idx]
-            node_positions.append([
-                int(node),
-                float(pos[0]),
-                float(pos[1]),
-                float(pos[2]),
-            ])
+            node_positions.append([int(node), float(pos[0]), float(pos[1]), float(pos[2])])
         else:
-            node_positions.append([
-                int(node),
-                0.0,
-                0.0,
-                0.0,
-            ])
+            node_positions.append([int(node), 0.0, 0.0, 0.0])
 
-
-    return {
-        "PrimarySystemNaturalFrequencies": natural_freqs,
-        "PrimarySystemModes": normalized_modes,
-        "PrimarySystemNodePositions": node_positions
-    }
+    return {"PrimarySystemNaturalFrequencies": natural_freqs, "PrimarySystemModes": normalized_modes, "PrimarySystemNodePositions": node_positions}

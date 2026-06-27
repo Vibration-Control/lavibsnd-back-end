@@ -1,0 +1,11 @@
+[tool.ruff]
+# Set a generous limit so long variable names do not force a wrap
+line-length = 500
+
+[tool.ruff.format]
+# Prevents breaking arguments into separate lines
+skip-magic-trailing-comma = true
+
+[tool.black]
+line-length = 500
+skip-magic-trailing-comma = true
