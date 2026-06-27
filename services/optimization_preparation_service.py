@@ -203,7 +203,7 @@ def ga_preparation(optimization_input):
         def objective_funtion_wrapper(ga_instance, solution, solution_idx):
             objective_function_input_with_neutralizers = insert_neutralizers(objective_function_input, solution, gene_name, gene_per_neutralizer)
             receptance, objective = objective_function(objective_function_input_with_neutralizers)
-            return -objective
+            return objective
 
         return objective_funtion_wrapper
 
