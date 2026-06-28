@@ -27,6 +27,7 @@
   "responseNodeOptimization": 1,
   "excitationNodePlot": 1,
   "responseNodePlot": 1,
+  "objectiveFuncionType": 3,
   "plotType": 1,
   "neutralizers": [
     {
