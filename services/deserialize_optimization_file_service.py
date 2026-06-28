@@ -55,6 +55,7 @@ def deserialize_optimization_file(json_data) -> InputData:
         response_node_optimization=data["responseNodeOptimization"],
         excitation_node_plot=data["excitationNodePlot"],
         response_node_plot=data["responseNodePlot"],
+        objective_function_type=data["objectiveFunctionType"],
         plot_type=data["plotType"],
         neutralizers=neutralizers,
         additional_parameters=additional_parameters,

@@ -73,6 +73,7 @@ class InputData:
         response_node_optimization: int,
         excitation_node_plot: int,
         response_node_plot: int,
+        objective_function_type: int, 
         plot_type: int,
         neutralizers: List[Neutralizer],
         additional_parameters: AdditionalParameters,
@@ -91,6 +92,7 @@ class InputData:
         self.response_node_optimization = response_node_optimization
         self.excitation_node_plot = excitation_node_plot
         self.response_node_plot = response_node_plot
+        self.objective_function_type = objective_function_type
         self.plot_type = plot_type
         self.neutralizers = neutralizers
         self.additional_parameters = additional_parameters
@@ -119,7 +121,7 @@ class NeutralizerParameters:
 
 
 class ObjectiveFunctionInput:
-    def __init__(self, frequencies: list[float], user_defined_dynamic_stiffnesses: list[float], complex_shear_moduluses: list[float], neutralizers: list[NeutralizerParameters], primary_system_natural_frequencies: list[float], primary_system_modal_damping: list[float], primary_system_modes: list[list[float]], excitation_node_optimization: int, response_node_optimization: int, objective_function_search_lower_bound: float, objective_function_search_upper_bound: float):
+    def __init__(self, frequencies: list[float], user_defined_dynamic_stiffnesses: list[float], complex_shear_moduluses: list[float], neutralizers: list[NeutralizerParameters], primary_system_natural_frequencies: list[float], primary_system_modal_damping: list[float], primary_system_modes: list[list[float]],objective_function_type:int, excitation_node_optimization: int, response_node_optimization: int, objective_function_search_lower_bound: float, objective_function_search_upper_bound: float):
         self.frequencies = frequencies
         self.complex_shear_moduluses = complex_shear_moduluses
         self.user_defined_dynamic_stiffnesses = user_defined_dynamic_stiffnesses
@@ -127,6 +129,7 @@ class ObjectiveFunctionInput:
         self.primary_system_natural_frequencies = primary_system_natural_frequencies
         self.primary_system_modal_damping = primary_system_modal_damping
         self.primary_system_modes = primary_system_modes
+        self.objective_function_type = objective_function_type
         self.excitation_node_optimization = excitation_node_optimization
         self.response_node_optimization = response_node_optimization
         self.objective_function_search_lower_bound = objective_function_search_lower_bound

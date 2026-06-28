@@ -55,7 +55,7 @@ def objective_function(optimization_data, plot=False):
         inverse_composed_system_matrix = np.linalg.inv(composed_system_stiffness)
 
         receptance[i], objective_by_frequency[i] = calculate_objective(
-            objective_type=3,
+            objective_type=optimization_data.objective_function_type,
             Dinv=inverse_composed_system_matrix,
             phi=phi,
             optimization_data=optimization_data,

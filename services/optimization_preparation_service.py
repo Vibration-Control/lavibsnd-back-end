@@ -45,6 +45,7 @@ def prepare_objective_function_input(optimization_data, plot=False):
         primary_system_natural_frequencies=optimization_data.primary_system_natural_frequencies,
         primary_system_modal_damping=optimization_data.primary_system_modal_damping,
         primary_system_modes=optimization_data.primary_system_modes,
+        objective_function_type=optimization_data.objective_function_type,
         excitation_node_optimization=excitation_node,
         response_node_optimization=response_node,
         objective_function_search_lower_bound=optimization_data.objective_function_search_lower_bound,
