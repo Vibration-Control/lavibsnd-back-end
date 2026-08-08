@@ -1,19 +1,54 @@
 from services.deserialize_optimization_file_service import deserialize_optimization_file
-from services.optimization_preparation_service import ga_preparation, optimal_solution
+from services.optimization_preparation_service import (
+    ga_preparation,
+    optimal_solution,
+    lbfgsb_optimization
+)
 
 import numpy as np
 
 
 def neutralizer_optimization(data):
+
     optimization_input = deserialize_optimization_file(data)
-    ga_instance, gene_name, gene_per_neutralizer = ga_preparation(optimization_input)
+
+    ga_instance, gene_name, gene_per_neutralizer = ga_preparation(
+        optimization_input
+    )
 
     # Run the GA
     ga_instance.run()
 
-    # Get the best solution
+    # Get the best GA solution
     solution, solution_fitness, solution_idx = ga_instance.best_solution()
-    print(f"Best solution: {solution}, Fitness: {solution_fitness}")
+
+    print(f"Best GA solution: {solution}, Fitness: {solution_fitness}")
+
+    # Refine the GA solution using L-BFGS-B
+    optimized_solution, optimized_fitness = lbfgsb_optimization(
+        optimization_input,
+        solution,
+        gene_name,
+        gene_per_neutralizer
+    )
+
+    # Only replace the GA solution if L-BFGS-B improved it
+    if optimized_fitness > solution_fitness:
+
+        solution = optimized_solution
+        solution_fitness = optimized_fitness
+
+        print(
+            f"L-BFGS-B improved solution: "
+            f"{solution}, Fitness: {solution_fitness}"
+        )
+
+    else:
+
+        print(
+            "L-BFGS-B did not improve the GA solution. "
+            "Keeping GA solution."
+        )
 
     optimal_receptance, primary_system_receptance, receptances_with_detuning, optimezed_neutralizer = optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer)
     primary_system_frf = 20 * np.log10(abs(primary_system_receptance))

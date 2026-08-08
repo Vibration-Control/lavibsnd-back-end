@@ -4,6 +4,7 @@ from typing import List
 import pygad
 from services.objective_function_service import objective_function
 from services.primary_system_service import primary_system_response
+from scipy.optimize import minimize
 
 
 def prepare_objective_function_input(optimization_data, plot=False):
@@ -88,7 +89,6 @@ def compute_neutralizer_mass(neutralizer, optimization_data):
         amplitude = abs(shape[neutralizer.modal_position])
         total_mass += neutralizer.original_mass / amplitude**2
 
-    print(f"total_mass: {total_mass}")
     return total_mass / len(valid_modes) if valid_modes else 0.0
 
 
@@ -124,22 +124,23 @@ def calculate_receptances_with_temperature_detuning(optimization_input, plot_inp
 
         # For each neutralizer that has a viscoelastic material,
         # recompute its complex shear modulus with the detuned temperature
-        complex_shear_mods = []
+        complex_shear_mods = list(modified_input.complex_shear_moduluses)
+
         for neu in modified_input.neutralizers:
             if neu.viscoelastic_material is not None:
-                # Temporarily adjust working temperature
-                viscoelastic = optimization_input.additional_parameters.viscoelastic_materials[neu.viscoelastic_material]
+                material_index = neu.viscoelastic_material
+
+                viscoelastic = optimization_input.additional_parameters.viscoelastic_materials[material_index]
                 original_temperature = viscoelastic.workingTemperature
                 viscoelastic.workingTemperature = temperature
 
-                # Recompute modulus
-                complex_shear_mod = complex_shear_modulus(viscoelastic, modified_input.frequencies)
-                complex_shear_mods.append(complex_shear_mod)
+                complex_shear_mods[material_index] = complex_shear_modulus(
+                    viscoelastic,
+                    modified_input.frequencies
+                )
 
-                # Restore working temperature so we don't mess with other runs
                 viscoelastic.workingTemperature = original_temperature
 
-        # Replace the complex_shear_moduluses for this run
         modified_input.complex_shear_moduluses = complex_shear_mods
 
         # Compute receptance
@@ -150,6 +151,28 @@ def calculate_receptances_with_temperature_detuning(optimization_input, plot_inp
 
     return receptances_with_detuning
 
+def _evaluate_solution(
+    optimization_input,
+    solution,
+    gene_name,
+    gene_per_neutralizer
+):
+    objective_function_input = prepare_objective_function_input(
+        optimization_input
+    )
+
+    objective_function_input_with_neutralizers = insert_neutralizers(
+        objective_function_input,
+        solution,
+        gene_name,
+        gene_per_neutralizer
+    )
+
+    receptance, objective = objective_function(
+        objective_function_input_with_neutralizers
+    )
+
+    return objective
 
 def optimal_solution(optimization_input, solution, gene_name, gene_per_neutralizer):
     # Prepare inputs
@@ -219,3 +242,149 @@ def ga_preparation(optimization_input):
     ga_instance = pygad.GA(num_generations=num_generations, num_parents_mating=num_parents_mating, fitness_func=objective_funtion_wrapper_factory(objective_function_input, gene_name, gene_per_neutralizer), sol_per_pop=sol_per_pop, num_genes=len(gene_types), gene_type=gene_types, gene_space=gene_space, crossover_probability=crossover_probability, mutation_probability=mutation_probability)
 
     return ga_instance, gene_name, gene_per_neutralizer
+
+def lbfgsb_optimization(
+    optimization_input,
+    solution,
+    gene_name,
+    gene_per_neutralizer
+):
+
+    # ---------------------------------------------------------
+    # Identify continuous variables and their bounds
+    # ---------------------------------------------------------
+
+    continuous_indices = []
+    continuous_bounds = []
+
+    gene_index = 0
+
+    for neutralizer in optimization_input.neutralizers:
+
+        # Real variables
+        for real_variable in neutralizer.optimization_variables.real:
+
+            continuous_indices.append(gene_index)
+
+            continuous_bounds.append(
+                (
+                    real_variable.lower_bound,
+                    real_variable.upper_bound
+                )
+            )
+
+            gene_index += 1
+
+        # Integer variables
+        for integer_variable in neutralizer.optimization_variables.integer:
+
+            # Integer variables remain fixed
+            gene_index += 1
+
+    # Nothing to optimize
+    if not continuous_indices:
+
+        fitness = _evaluate_solution(
+            optimization_input,
+            solution,
+            gene_name,
+            gene_per_neutralizer
+        )
+
+        return solution, fitness
+
+    # ---------------------------------------------------------
+    # Initial solution
+    # ---------------------------------------------------------
+
+    initial_values = np.array(
+        [solution[index] for index in continuous_indices],
+        dtype=float
+    )
+
+    # ---------------------------------------------------------
+    # Objective function for L-BFGS-B
+    # ---------------------------------------------------------
+
+    def objective_to_minimize(continuous_values):
+
+        candidate_solution = list(solution)
+
+        for index, value in zip(
+            continuous_indices,
+            continuous_values
+        ):
+            candidate_solution[index] = float(value)
+
+        fitness = _evaluate_solution(
+            optimization_input,
+            candidate_solution,
+            gene_name,
+            gene_per_neutralizer
+        )
+
+        # Rescale objective for numerical stability
+        scaled_fitness = fitness * 1e13
+
+        # PyGAD maximizes fitness.
+        # scipy.optimize.minimize() minimizes.
+        return -scaled_fitness
+
+    # ---------------------------------------------------------
+    # Run L-BFGS-B
+    # ---------------------------------------------------------
+
+    result = minimize(
+        objective_to_minimize,
+        initial_values,
+        method="L-BFGS-B",
+        bounds=continuous_bounds,
+        options={
+            "maxiter": 500,
+            "ftol": 1e-12,
+            "gtol": 1e-8,
+            "maxls": 50,
+            "maxfun": 5000,
+            "finite_diff_rel_step": 1e-5
+        }
+    )
+
+    # ---------------------------------------------------------
+    # Build optimized solution
+    # ---------------------------------------------------------
+
+    optimized_solution = list(solution)
+
+    for index, value in zip(
+        continuous_indices,
+        result.x
+    ):
+        optimized_solution[index] = float(value)
+
+    # ---------------------------------------------------------
+    # Evaluate final solution
+    # ---------------------------------------------------------
+
+    optimized_fitness = _evaluate_solution(
+        optimization_input,
+        optimized_solution,
+        gene_name,
+        gene_per_neutralizer
+    )
+
+    iterations = getattr(result, "nit", 0)
+    evaluations = getattr(result, "nfev", 0)
+
+    print(
+        f"L-BFGS-B finished: success={result.success}, "
+        f"iterations={iterations}, "
+        f"evaluations={evaluations}"
+    )
+
+    print(
+        f"L-BFGS-B result: "
+        f"{optimized_solution}, "
+        f"Fitness: {optimized_fitness}"
+    )
+
+    return optimized_solution, optimized_fitness
