@@ -102,7 +102,7 @@
     "additionalParameters": {
       "viscoelasticMaterials": [
         {
-          "name": "Elastomero BT 806/55",
+          "name": "Elastômero BT 806/55",
           "workingTemperature": 293,
           "referenceTemperature": 243,
           "upperShearModulus": 15233333,
