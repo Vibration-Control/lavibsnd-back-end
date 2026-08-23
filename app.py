@@ -28,6 +28,9 @@ def convertRst():
 
     return jsonify(json_result)
 
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"})
 
 if __name__ == "__main__":
     app.run(
