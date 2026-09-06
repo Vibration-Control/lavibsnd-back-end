@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 def objective_function(optimization_data, plot=False):
 
     number_of_neutralizers = len(optimization_data.neutralizers)
@@ -28,7 +27,6 @@ def objective_function(optimization_data, plot=False):
                         frequency_ratio,
                         calculate_real_shear_module_ratio(complex_shear_module_per_neutralizer, l, i, frequency_index_per_neutralizer),
                         calculate_loss_factor_per_neutralizer(loss_factor_per_neutralizer, l, i),
-                        calculate_dynamic_stiffness(optimization_data.user_defined_dynamic_stiffnesses, optimization_data.neutralizers[l].dynamic_stiffness, i),
                         calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neutralizer, l, i, frequency_index_per_neutralizer),
                     )
 
@@ -66,13 +64,14 @@ def objective_function(optimization_data, plot=False):
     return receptance, objective
 
 
-def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio=0, loss_factor=0, dynamic_stifness=0.0, real_shear_module_at_system_frequency=0.0):
+def equivalent_parameters(neutralizer, frequency_ratio, real_shear_module_ratio=0, loss_factor=0, real_dynamic_stiffness=0.0, imaginary_dynamic_stiffness=0.0, real_shear_module_at_system_frequency=0.0):
     equivalent_mass = 0
     equivalent_damp = 0
     if neutralizer.type == 0:
         frequency = frequency_ratio * neutralizer.frequency
-        equivalent_damp = complex(0, dynamic_stifness / frequency)
-        equivalent_mass = complex(dynamic_stifness / frequency**2, 0)
+        omega = 2 * np.pi * frequency
+        equivalent_damp = imaginary_dynamic_stiffness / omega
+        equivalent_mass = real_dynamic_stiffness / omega**2
     if neutralizer.type == 1:
         denominator = (frequency_ratio**2 - real_shear_module_ratio) ** 2 + (real_shear_module_ratio * loss_factor) ** 2
         equivalent_damp = neutralizer.mass * neutralizer.frequency * real_shear_module_ratio * loss_factor * frequency_ratio**3 / denominator
@@ -115,13 +114,6 @@ def calculate_loss_factor_per_neutralizer(loss_factor_per_neutralizer, neutraliz
     if len(loss_factor_per_neutralizer) > 0:
         loss_factor = loss_factor_per_neutralizer[neutralizers_index][frequency_index]
     return loss_factor
-
-
-def calculate_dynamic_stiffness(user_defined_dynamic_stiffnesses, dynamic_stiffness_index, frequency_index):
-    dynamic_stiffness = 0
-    if len(user_defined_dynamic_stiffnesses) > 0:
-        dynamic_stiffness = user_defined_dynamic_stiffnesses[dynamic_stiffness_index][frequency_index]
-    return dynamic_stiffness
 
 
 def calculate_real_shear_module_at_system_frequency(complex_shear_module_per_neutralizer, neutralizers_index, frequency_index, frequency_index_per_neutralizer):

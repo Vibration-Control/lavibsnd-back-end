@@ -32,12 +32,34 @@ def deserialize_optimization_file(json_data) -> InputData:
     def parse_genetic_algorithm(data):
         return GeneticAlgorithm(population_size=data["populationSize"], generations=data["generations"], crossover=data["crossover"], mutation=data["mutation"])
 
-    def parse_additional_parameters(data):
-        user_defined_dynamic_stiffnesses = [parse_dynamic_stiffness_variable(item) for item in data["userDefinedDynamicStiffnesses"]]
-        viscoelastic_materials = [parse_viscoelastic_material(item) for item in data["viscoelasticMaterials"]]
-        temperature_detuning = data["temperatureDetuning"]
-        return AdditionalParameters(user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses, temperature_detuning=temperature_detuning, viscoelastic_materials=viscoelastic_materials)
+    def parse_dynamic_stiffness_variable(data):
+        return DynamicStiffnessVariable(
+            name=data["name"],
+            frequency_on_measurement=data["frequencyOnMeasurement"],
+            real_dynamic_stiffness=data["realDynamicStiffness"],
+            imaginary_dynamic_stiffness=data["imaginaryDynamicStiffness"],
+            checked=data.get("checked", False)
+        )
 
+    def parse_additional_parameters(data):
+        user_defined_dynamic_stiffnesses = [
+            parse_dynamic_stiffness_variable(item)
+            for item in data["userDefinedDynamicStiffnesses"]
+        ]
+
+        viscoelastic_materials = [
+            parse_viscoelastic_material(item)
+            for item in data["viscoelasticMaterials"]
+        ]
+
+        temperature_detuning = data["temperatureDetuning"]
+
+        return AdditionalParameters(
+            user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses,
+            temperature_detuning=temperature_detuning,
+            viscoelastic_materials=viscoelastic_materials
+        )
+    
     # Parse neutralizers
     neutralizers = [parse_neutralizer(item) for item in data["neutralizers"]]
 

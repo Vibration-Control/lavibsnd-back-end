@@ -25,9 +25,35 @@ def prepare_objective_function_input(optimization_data, plot=False):
         complex_shear_module = complex_shear_modulus(viscoelastic_material, frequencies)
         complex_shear_moduluses.append(complex_shear_module)
 
-    user_defined_dynamic_stiffnesses = []
-    for user_defined_dynamic_stiffness in optimization_data.additional_parameters.user_defined_dynamic_stiffnesses:
-        user_defined_dynamic_stiffnesses.append(user_defined_dynamic_stiffness.range)
+    real_user_defined_dynamic_stiffnesses = []
+    imaginary_user_defined_dynamic_stiffnesses = []
+    for user_defined_dynamic_stiffness in (
+        optimization_data.additional_parameters.user_defined_dynamic_stiffnesses
+    ):
+
+        (
+            interpolated_real,
+            interpolated_imaginary
+        ) = interpolate_dynamic_stiffness(
+            measurement_frequencies=(
+                user_defined_dynamic_stiffness.frequency_on_measurement
+            ),
+            real_dynamic_stiffness=(
+                user_defined_dynamic_stiffness.real_dynamic_stiffness
+            ),
+            imaginary_dynamic_stiffness=(
+                user_defined_dynamic_stiffness.imaginary_dynamic_stiffness
+            ),
+            target_frequencies=frequencies
+        )
+
+        real_user_defined_dynamic_stiffnesses.append(
+            interpolated_real.tolist()
+        )
+
+        imaginary_user_defined_dynamic_stiffnesses.append(
+            interpolated_imaginary.tolist()
+        )
 
     excitation_node = 0
     response_node = 0
@@ -41,7 +67,12 @@ def prepare_objective_function_input(optimization_data, plot=False):
     objective_function_input = ObjectiveFunctionInput(
         frequencies=frequencies,
         complex_shear_moduluses=complex_shear_moduluses,
-        user_defined_dynamic_stiffnesses=user_defined_dynamic_stiffnesses,
+        real_user_defined_dynamic_stiffnesses=(
+            real_user_defined_dynamic_stiffnesses
+        ),
+        imaginary_user_defined_dynamic_stiffnesses=(
+            imaginary_user_defined_dynamic_stiffnesses
+        ),
         neutralizers=neutralizers,
         primary_system_natural_frequencies=optimization_data.primary_system_natural_frequencies,
         primary_system_modal_damping=optimization_data.primary_system_modal_damping,
@@ -76,6 +107,76 @@ def alfa(referenceTemperature, workingTemperature, teta1, teta2):
     alfa = 10.0 ** (-teta1 * deltaT / (teta2 + deltaT))
     return alfa
 
+def interpolate_dynamic_stiffness(
+    measurement_frequencies: list[float],
+    real_dynamic_stiffness: list[float],
+    imaginary_dynamic_stiffness: list[float],
+    target_frequencies: np.ndarray
+):
+    measurement_frequencies = np.asarray(
+        measurement_frequencies,
+        dtype=float
+    )
+
+    real_dynamic_stiffness = np.asarray(
+        real_dynamic_stiffness,
+        dtype=float
+    )
+
+    imaginary_dynamic_stiffness = np.asarray(
+        imaginary_dynamic_stiffness,
+        dtype=float
+    )
+
+    target_frequencies = np.asarray(
+        target_frequencies,
+        dtype=float
+    )
+
+    if not (
+        len(measurement_frequencies)
+        == len(real_dynamic_stiffness)
+        == len(imaginary_dynamic_stiffness)
+    ):
+        raise ValueError(
+            "Frequency, real dynamic stiffness and imaginary dynamic "
+            "stiffness arrays must have the same length."
+        )
+
+    if len(measurement_frequencies) == 0:
+        raise ValueError(
+            "Dynamic stiffness arrays cannot be empty."
+        )
+
+    # np.interp requires the x values to be ordered.
+    sort_indices = np.argsort(measurement_frequencies)
+
+    measurement_frequencies = measurement_frequencies[sort_indices]
+    real_dynamic_stiffness = real_dynamic_stiffness[sort_indices]
+    imaginary_dynamic_stiffness = imaginary_dynamic_stiffness[sort_indices]
+
+    # Make sure there are no duplicate frequency values.
+    unique_frequencies, unique_indices = np.unique(
+        measurement_frequencies,
+        return_index=True
+    )
+
+    real_dynamic_stiffness = real_dynamic_stiffness[unique_indices]
+    imaginary_dynamic_stiffness = imaginary_dynamic_stiffness[unique_indices]
+
+    interpolated_real = np.interp(
+        target_frequencies,
+        unique_frequencies,
+        real_dynamic_stiffness
+    )
+
+    interpolated_imaginary = np.interp(
+        target_frequencies,
+        unique_frequencies,
+        imaginary_dynamic_stiffness
+    )
+
+    return interpolated_real, interpolated_imaginary
 
 def compute_neutralizer_mass(neutralizer, optimization_data):
     if neutralizer.mass_type_user_defined:
