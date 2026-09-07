@@ -44,8 +44,6 @@ if __name__ == "__main__":
     # When packaged with PyInstaller --noconsole,
     # there is no valid Windows console.
     if getattr(sys, "frozen", False):
-        os.environ["WERKZEUG_RUN_MAIN"] = "true"
-
         sys.stdout = open(os.devnull, "w")
         sys.stderr = open(os.devnull, "w")
 
